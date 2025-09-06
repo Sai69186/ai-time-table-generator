@@ -43,9 +43,11 @@ const Navigation = (function() {
     function setupEventListeners() {
         // Logout button
         document.addEventListener('click', function(e) {
-            if (e.target.closest('#logoutBtn')) {
+            if (e.target.closest('#logoutBtn') || e.target.closest('.signout-btn')) {
                 e.preventDefault();
-                Auth.logout();
+                if (confirm('Are you sure you want to sign out?')) {
+                    Auth.logout();
+                }
             }
             
             // Mobile menu toggle

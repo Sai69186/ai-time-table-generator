@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "AI Timetable Generator API Tests",
+    "description": "Complete API test collection for timetable generation system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.access_token) {",
+                  "        pm.collectionVariables.set('access_token', response.access_token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sections",
+      "item": [
+        {
+          "name": "Create Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CSE-A\",\n  \"year\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sections",
+              "host": ["{{base_url}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Get All Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections",
+              "host": ["{{base_url}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Delete Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/1",
+              "host": ["{{base_url}}"],
+              "path": ["sections", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Data Structures\",\n  \"code\": \"CS201\",\n  \"teacher\": \"Dr. Smith\",\n  \"room\": \"Room 101\",\n  \"duration\": 2,\n  \"color\": \"#3f51b5\",\n  \"section_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses",
+              "host": ["{{base_url}}"],
+              "path": ["courses"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/1/courses",
+              "host": ["{{base_url}}"],
+              "path": ["sections", "1", "courses"]
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses/1",
+              "host": ["{{base_url}}"],
+              "path": ["courses", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timetables",
+      "item": [
+        {
+          "name": "Generate Timetable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"section_id\": 1,\n  \"start_time\": \"09:00\",\n  \"end_time\": \"16:00\",\n  \"period_duration\": 50,\n  \"break_duration\": 10,\n  \"lunch_start\": \"12:30\",\n  \"lunch_duration\": 45,\n  \"working_days\": [\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/timetables/generate",
+              "host": ["{{base_url}}"],
+              "path": ["timetables", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get Timetable",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/1/timetable",
+              "host": ["{{base_url}}"],
+              "path": ["sections", "1", "timetable"]
+            }
+          }
+        },
+        {
+          "name": "Delete Timetable",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetables/1",
+              "host": ["{{base_url}}"],
+              "path": ["timetables", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

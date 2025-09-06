@@ -337,6 +337,111 @@
             gap: 1rem;
             margin-top: 2rem;
         }
+        
+        .university-timetable-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(5, 1fr);
+            gap: 1px;
+            background: #ddd;
+            margin: 2rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .time-header, .day-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .time-slot {
+            background: #34495e;
+            color: white;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .course-slot {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin: 2px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .course-code {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+        
+        .course-name {
+            font-size: 0.8rem;
+            color: #34495e;
+            margin: 2px 0;
+        }
+        
+        .course-teacher {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .course-room {
+            font-size: 0.7rem;
+            color: #95a5a6;
+        }
+        
+        .break-slot {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            padding: 1rem;
+            text-align: center;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .empty-slot {
+            background: #f8f9fa;
+            color: #adb5bd;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timetable-header-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #3498db;
+        }
+        
+        .entity-item {
+            background: white;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .entity-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -378,87 +483,164 @@
             
             <h1>College Time Table Generator</h1>
             
-            <!-- Step 1: Basic Information -->
+            <!-- Step 1: University Setup -->
             <div id="step1" class="form-step active">
-                <h2>Basic Information</h2>
-                <div class="form-group">
-                    <label for="instituteName">Institute Name</label>
-                    <input type="text" id="instituteName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="academicYear">Academic Year</label>
-                    <input type="text" id="academicYear" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="semester">Semester</label>
-                    <input type="text" id="semester" class="form-control" required>
+                <h2>University Setup - Branches</h2>
+                <div class="entity-section">
+                    <h3>Create Branches</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="branchName">Branch Name</label>
+                            <input type="text" id="branchName" class="form-control" placeholder="Computer Science Engineering">
+                        </div>
+                        <div class="form-group">
+                            <label for="branchCode">Branch Code</label>
+                            <input type="text" id="branchCode" class="form-control" placeholder="CSE">
+                        </div>
+                    </div>
+                    <button type="button" class="btn" id="createBranchBtn">Create Branch</button>
+                    <div id="branchesDisplay"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn next-btn" data-next="2">Next <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
             
-            <!-- Step 2: Add Sections -->
+            <!-- Step 2: Sections -->
             <div id="step2" class="form-step">
-                <h2>Add Sections</h2>
-                <div class="sections-container">
-                    <div class="form-row">
+                <h2>Create Sections</h2>
+                <div class="entity-section">
+                    <h3>Add Sections</h3>
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="sectionName">Section Name</label>
-                            <input type="text" id="sectionName" class="form-control">
+                            <input type="text" id="sectionName" class="form-control" placeholder="A">
                         </div>
-                        <button type="button" class="btn" id="addSectionBtn" style="align-self: flex-end;">
-                            <i class="fas fa-plus"></i> Add Section
-                        </button>
+                        <div class="form-group">
+                            <label for="sectionYear">Year</label>
+                            <select id="sectionYear" class="form-control">
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sectionSemester">Semester</label>
+                            <select id="sectionSemester" class="form-control">
+                                <option value="1">1st Semester</option>
+                                <option value="2">2nd Semester</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sectionBranch">Branch</label>
+                            <select id="sectionBranch" class="form-control branch-select">
+                                <option value="">Select Branch</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sectionStrength">Strength</label>
+                            <input type="number" id="sectionStrength" class="form-control" value="60">
+                        </div>
                     </div>
-                    <div id="sectionsList" class="sections-list">
-                        <!-- Sections will be added here -->
-                    </div>
+                    <button type="button" class="btn" id="createSectionBtn">Create Section</button>
+                    <div id="sectionsDisplay"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn prev-btn" data-prev="1"><i class="fas fa-arrow-left"></i> Previous</button>
-                    <button type="button" class="btn next-btn" data-next="3" id="toStep3">Next <i class="fas fa-arrow-right"></i></button>
+                    <button type="button" class="btn next-btn" data-next="3">Next <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
             
-            <!-- Step 3: Add Courses -->
+            <!-- Step 3: Resources -->
             <div id="step3" class="form-step">
-                <h2>Add Courses</h2>
-                <div class="form-group">
-                    <label for="selectedSection">Select Section</label>
-                    <select id="selectedSection" class="form-control">
-                        <!-- Sections will be populated here -->
-                    </select>
-                </div>
+                <h2>Create Resources</h2>
                 
-                <div class="course-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="courseName">Course Name</label>
-                            <input type="text" id="courseName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="courseCode">Course Code</label>
-                            <input type="text" id="courseCode" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-row">
+                <!-- Teachers Section -->
+                <div class="entity-section">
+                    <h3>Teachers</h3>
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="teacherName">Teacher Name</label>
-                            <input type="text" id="teacherName" class="form-control">
+                            <input type="text" id="teacherName" class="form-control" placeholder="Dr. John Smith">
                         </div>
                         <div class="form-group">
-                            <label for="courseDuration">Duration (hours)</label>
-                            <input type="number" id="courseDuration" class="form-control" min="1" value="1">
+                            <label for="teacherEmployeeId">Employee ID</label>
+                            <input type="text" id="teacherEmployeeId" class="form-control" placeholder="EMP001">
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherDepartment">Department</label>
+                            <input type="text" id="teacherDepartment" class="form-control" placeholder="Computer Science">
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherMaxHours">Max Hours/Day</label>
+                            <input type="number" id="teacherMaxHours" class="form-control" value="6">
                         </div>
                     </div>
-                    <button type="button" class="btn" id="addCourseBtn">
-                        <i class="fas fa-plus"></i> Add Course
-                    </button>
+                    <button type="button" class="btn" id="createTeacherBtn">Create Teacher</button>
+                    <div id="teachersDisplay"></div>
                 </div>
                 
-                <div id="coursesList" class="courses-list">
-                    <!-- Courses will be listed here -->
+                <!-- Rooms Section -->
+                <div class="entity-section">
+                    <h3>Rooms</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="roomNumber">Room Number</label>
+                            <input type="text" id="roomNumber" class="form-control" placeholder="101">
+                        </div>
+                        <div class="form-group">
+                            <label for="roomBuilding">Building</label>
+                            <input type="text" id="roomBuilding" class="form-control" placeholder="Main Block">
+                        </div>
+                        <div class="form-group">
+                            <label for="roomCapacity">Capacity</label>
+                            <input type="number" id="roomCapacity" class="form-control" value="60">
+                        </div>
+                        <div class="form-group">
+                            <label for="roomType">Room Type</label>
+                            <select id="roomType" class="form-control">
+                                <option value="classroom">Classroom</option>
+                                <option value="lab">Laboratory</option>
+                                <option value="auditorium">Auditorium</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn" id="createRoomBtn">Create Room</button>
+                    <div id="roomsDisplay"></div>
+                </div>
+                
+                <!-- Subjects Section -->
+                <div class="entity-section">
+                    <h3>Subjects</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="subjectName">Subject Name</label>
+                            <input type="text" id="subjectName" class="form-control" placeholder="Data Structures">
+                        </div>
+                        <div class="form-group">
+                            <label for="subjectCode">Subject Code</label>
+                            <input type="text" id="subjectCode" class="form-control" placeholder="CS201">
+                        </div>
+                        <div class="form-group">
+                            <label for="subjectCredits">Credits</label>
+                            <input type="number" id="subjectCredits" class="form-control" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label for="subjectType">Type</label>
+                            <select id="subjectType" class="form-control">
+                                <option value="theory">Theory</option>
+                                <option value="lab">Laboratory</option>
+                                <option value="tutorial">Tutorial</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subjectHours">Hours/Week</label>
+                            <input type="number" id="subjectHours" class="form-control" value="3">
+                        </div>
+                    </div>
+                    <button type="button" class="btn" id="createSubjectBtn">Create Subject</button>
+                    <div id="subjectsDisplay"></div>
                 </div>
                 
                 <div class="form-actions">
@@ -467,19 +649,94 @@
                 </div>
             </div>
             
-            <!-- Step 4: Generate Timetable -->
+            <!-- Step 4: Courses & Generate -->
             <div id="step4" class="form-step">
-                <h2>Generate Timetable</h2>
-                <div id="timetableContainer">
-                    <!-- Timetable will be generated here -->
+                <h2>Create Courses & Generate Timetable</h2>
+                
+                <!-- Course Assignment -->
+                <div class="entity-section">
+                    <h3>Assign Courses</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="courseSectionId">Section</label>
+                            <select id="courseSectionId" class="form-control section-select">
+                                <option value="">Select Section</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseSubjectId">Subject</label>
+                            <select id="courseSubjectId" class="form-control">
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseTeacherId">Teacher</label>
+                            <select id="courseTeacherId" class="form-control">
+                                <option value="">Select Teacher</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseRoomId">Room (Optional)</label>
+                            <select id="courseRoomId" class="form-control">
+                                <option value="">Select Room</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn" id="createCourseBtn">Create Course</button>
+                    <div id="coursesDisplay"></div>
                 </div>
+                
+                <!-- Timetable Configuration -->
+                <div class="entity-section">
+                    <h3>Timetable Configuration</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="timetableSectionId">Generate for Section</label>
+                            <select id="timetableSectionId" class="form-control section-select">
+                                <option value="">Select Section</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="startTime">Start Time</label>
+                            <input type="time" id="startTime" class="form-control" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="endTime">End Time</label>
+                            <input type="time" id="endTime" class="form-control" value="16:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="periodDuration">Period Duration (min)</label>
+                            <input type="number" id="periodDuration" class="form-control" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="lunchStart">Lunch Start</label>
+                            <input type="time" id="lunchStart" class="form-control" value="12:30">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Working Days</label>
+                        <div class="days-checkbox">
+                            <label><input type="checkbox" name="workingDays" value="Monday" checked> Monday</label>
+                            <label><input type="checkbox" name="workingDays" value="Tuesday" checked> Tuesday</label>
+                            <label><input type="checkbox" name="workingDays" value="Wednesday" checked> Wednesday</label>
+                            <label><input type="checkbox" name="workingDays" value="Thursday" checked> Thursday</label>
+                            <label><input type="checkbox" name="workingDays" value="Friday" checked> Friday</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="timetableContainer">
+                    <!-- Generated timetable will appear here -->
+                </div>
+                
+                <div id="conflictsContainer" style="display: none;">
+                    <!-- Conflicts will be shown here -->
+                </div>
+                
                 <div class="form-actions">
                     <button type="button" class="btn prev-btn" data-prev="3"><i class="fas fa-arrow-left"></i> Previous</button>
-                    <button type="button" class="btn" id="generateTimetableBtn">
-                        <i class="fas fa-magic"></i> Generate Timetable
-                    </button>
-                    <button type="button" class="btn" id="saveTimetableBtn" style="display: none;">
-                        <i class="fas fa-save"></i> Save Timetable
+                    <button type="button" class="btn" id="generateUniversityTimetableBtn">
+                        <i class="fas fa-magic"></i> Generate University Timetable
                     </button>
                 </div>
             </div>
@@ -669,8 +926,9 @@
         <p>All rights reserved by Vignan Lara</p>
     </footer>
 
-    <script src="timetable-script-clean.js"></script>
-    <script src="js/section-manager.js"></script>
+    <script src="js/timetable-api.js"></script>
+    <script src="js/university-timetable.js"></script>
+    <script src="js/enhanced-timetable.js"></script>
     <script>
         // Check if page is being refreshed using sessionStorage
         (function() {
@@ -694,38 +952,58 @@
             });
         })();
     
-        // Initialize the API service if not already defined
+        // Initialize the API service with authentication
         if (!window.apiService) {
             window.apiService = {
-                baseUrl: '/api',
+                baseUrl: 'http://localhost:3000/api',
+                
+                getHeaders: () => {
+                    const token = localStorage.getItem('token');
+                    return {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    };
+                },
+                
                 get: async (endpoint) => {
-                    const response = await fetch(`${window.apiService.baseUrl}${endpoint}`);
+                    const response = await fetch(`${window.apiService.baseUrl}${endpoint}`, {
+                        headers: window.apiService.getHeaders()
+                    });
+                    if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     return response.json();
                 },
+                
                 post: async (endpoint, data) => {
                     const response = await fetch(`${window.apiService.baseUrl}${endpoint}`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: window.apiService.getHeaders(),
                         body: JSON.stringify(data)
                     });
+                    if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     return response.json();
                 },
-                put: async (endpoint, data) => {
-                    const response = await fetch(`${window.apiService.baseUrl}${endpoint}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data)
-                    });
-                    return response.json();
-                },
+                
                 delete: async (endpoint) => {
                     const response = await fetch(`${window.apiService.baseUrl}${endpoint}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: window.apiService.getHeaders()
                     });
+                    if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     return response.json();
                 }
             };
@@ -808,19 +1086,28 @@
                 courses: [],
                 
                 // Add section
-                addSection: function() {
+                addSection: async function() {
                     const sectionName = document.getElementById('sectionName').value.trim();
                     if (!sectionName) return;
                     
-                    const section = {
-                        id: Date.now().toString(),
-                        name: sectionName
-                    };
-                    
-                    this.sections.push(section);
-                    this.updateSectionsList();
-                    this.updateSectionsDropdown();
-                    document.getElementById('sectionName').value = '';
+                    try {
+                        const response = await window.apiService.post('/sections', {
+                            name: sectionName,
+                            year: 1
+                        });
+                        
+                        if (response && response.success) {
+                            this.sections.push(response.data);
+                            this.updateSectionsList();
+                            this.updateSectionsDropdown();
+                            document.getElementById('sectionName').value = '';
+                        } else {
+                            alert('Failed to create section: ' + (response?.message || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating section:', error);
+                        alert('Error creating section. Please try again.');
+                    }
                 },
                 
                 // Update sections list
@@ -864,34 +1151,44 @@
                 },
                 
                 // Add course
-                addCourse: function() {
+                addCourse: async function() {
                     const sectionId = document.getElementById('selectedSection').value;
                     const courseName = document.getElementById('courseName').value.trim();
                     const courseCode = document.getElementById('courseCode').value.trim();
                     const teacherName = document.getElementById('teacherName').value.trim();
                     const duration = document.getElementById('courseDuration').value;
                     
-                    if (!courseName || !courseCode || !teacherName) {
-                        alert('Please fill in all course details');
+                    if (!courseName || !courseCode || !teacherName || !sectionId) {
+                        alert('Please fill in all course details and select a section');
                         return;
                     }
                     
-                    const course = {
-                        id: Date.now().toString(),
-                        sectionId,
-                        name: courseName,
-                        code: courseCode,
-                        teacher: teacherName,
-                        duration: parseInt(duration) || 1
-                    };
-                    
-                    this.courses.push(course);
-                    this.updateCoursesList();
-                    
-                    // Reset form
-                    document.getElementById('courseName').value = '';
-                    document.getElementById('courseCode').value = '';
-                    document.getElementById('teacherName').value = '';
+                    try {
+                        const response = await window.apiService.post('/courses', {
+                            name: courseName,
+                            code: courseCode,
+                            teacher: teacherName,
+                            room: '',
+                            duration: parseInt(duration) || 1,
+                            section_id: sectionId,
+                            color: '#3f51b5'
+                        });
+                        
+                        if (response && response.success) {
+                            this.courses.push(response.data);
+                            this.updateCoursesList();
+                            
+                            // Reset form
+                            document.getElementById('courseName').value = '';
+                            document.getElementById('courseCode').value = '';
+                            document.getElementById('teacherName').value = '';
+                        } else {
+                            alert('Failed to create course: ' + (response?.message || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating course:', error);
+                        alert('Error creating course. Please try again.');
+                    }
                 },
                 
                 // Update courses list

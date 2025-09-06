@@ -65,6 +65,11 @@
             background-color: #2980b9;
         }
         
+        .btn-login:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
         .login-footer {
             text-align: center;
             margin-top: 1.5rem;
@@ -89,6 +94,39 @@
             border-radius: 6px;
             margin-bottom: 1.5rem;
             display: none;
+        }
+        
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .strength-meter {
+            height: 5px;
+            background: #eee;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        
+        .strength-meter-fill {
+            height: 100%;
+            width: 0%;
+            background: #e74c3c;
+            transition: width 0.3s, background 0.3s;
+        }
+        
+        .strength-text {
+            color: #7f8c8d;
         }
     </style>
 </head>
@@ -118,9 +156,8 @@
                 <p>Sign in to access your AI-powered timetable</p>
             </div>
             
-            <div id="errorMessage" class="error-message">
-                Invalid email or password. Please try again.
-            </div>
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
             
             <form id="loginForm">
                 <div class="form-group">
@@ -156,13 +193,12 @@
                 
                 <div class="form-group">
                     <label for="signupPassword">Password <small>(min 8 characters, include number & special char)</small></label>
-                    <i class="fas fa-lock"></i>
                     <input type="password" id="signupPassword" class="form-control" placeholder="Create a strong password" required>
-                    <div class="password-strength" style="margin-top: 5px; font-size: 0.85rem;">
-                        <div class="strength-meter" style="height: 5px; background: #eee; border-radius: 5px; margin-bottom: 5px; overflow: hidden;">
-                            <div class="strength-meter-fill" style="height: 100%; width: 0%; background: #e74c3c; transition: width 0.3s, background 0.3s;"></div>
+                    <div class="password-strength">
+                        <div class="strength-meter">
+                            <div class="strength-meter-fill"></div>
                         </div>
-                        <div class="strength-text" style="color: #7f8c8d;"></div>
+                        <div class="strength-text"></div>
                     </div>
                 </div>
                 
@@ -184,26 +220,29 @@
                     Already have an account? <a href="#" id="loginLink">Login</a>
                 </div>
             </form>
-            
-            <div id="signupError" class="error-message"></div>
         </div>
     </main>
 
     <script>
+        // Login form handler
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMessage');
+            const submitBtn = this.querySelector('button[type="submit"]');
             
             if (!email || !password) {
-                showError('Please fill in all fields');
+                showMessage('Please fill in all fields', 'error');
                 return;
             }
             
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('http://localhost:3000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -213,27 +252,138 @@
                 
                 const data = await response.json();
                 
-                if (data.success) {
-                    localStorage.setItem('token', data.data.token);
-                    localStorage.setItem('user', JSON.stringify(data.data.user));
-                    window.location.href = 'index.html';
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
                 } else {
-                    errorDiv.style.display = 'block';
-                    errorDiv.textContent = data.message;
+                    let errorMessage = 'Login failed';
+                    
+                    if (data.detail) {
+                        if (Array.isArray(data.detail)) {
+                            errorMessage = data.detail.map(err => err.msg || err).join(', ');
+                        } else if (typeof data.detail === 'string') {
+                            errorMessage = data.detail;
+                        }
+                    } else if (data.message) {
+                        errorMessage = data.message;
+                    }
+                    
+                    showMessage(errorMessage, 'error');
                 }
             } catch (error) {
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Login failed. Please try again.';
+                console.error('Login error:', error);
+                showMessage('Network error. Please check if the server is running.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
         });
         
-        // Sign up link handler
+        // Signup form handler
+        document.getElementById('signupFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsChecked = document.getElementById('terms').checked;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            if (!fullName || !email || !password || !confirmPassword) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            const passwordCheck = checkPasswordStrength(password);
+            if (!passwordCheck.isStrong) {
+                showMessage(passwordCheck.feedback, 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!termsChecked) {
+                showMessage('You must accept the terms and conditions', 'error');
+                return;
+            }
+            
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: fullName,
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showMessage('Account created successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        this.reset();
+                        showLoginForm();
+                        showMessage('Registration successful! Please sign in.', 'success');
+                    }, 1500);
+                } else {
+                    let errorMessage = 'Registration failed';
+                    
+                    if (data.detail) {
+                        if (Array.isArray(data.detail)) {
+                            errorMessage = data.detail.map(err => err.msg || err).join(', ');
+                        } else if (typeof data.detail === 'string') {
+                            errorMessage = data.detail;
+                        }
+                    } else if (data.message) {
+                        errorMessage = data.message;
+                    }
+                    
+                    // Handle specific error cases
+                    if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
+                        errorMessage = 'This email is already registered. Please use a different email or try logging in.';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('Network error. Please check if the server is running.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+        
+        // Form switching
         document.getElementById('signupLink').addEventListener('click', function(e) {
             e.preventDefault();
             showSignupForm();
         });
         
-        // Login link handler
         document.getElementById('loginLink').addEventListener('click', function(e) {
             e.preventDefault();
             showLoginForm();
@@ -242,11 +392,13 @@
         function showSignupForm() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('signupFormElement').style.display = 'block';
+            clearMessages();
         }
         
         function showLoginForm() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('signupFormElement').style.display = 'none';
+            clearMessages();
         }
         
         // Password strength checker
@@ -276,116 +428,70 @@
             };
         }
         
-        // Signup form submission
-        document.getElementById('signupFormElement').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // Password strength indicator
+        document.getElementById('signupPassword').addEventListener('input', function() {
+            const password = this.value;
+            const strengthMeter = document.querySelector('.strength-meter-fill');
+            const strengthText = document.querySelector('.strength-text');
             
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const termsChecked = document.getElementById('terms').checked;
-            const errorDiv = document.getElementById('signupError');
-            const submitBtn = this.querySelector('button[type="submit"]');
-            
-            errorDiv.textContent = '';
-            errorDiv.style.display = 'none';
-            
-            if (!fullName || !email || !password || !confirmPassword) {
-                showError(errorDiv, 'Please fill in all fields');
+            if (password.length === 0) {
+                strengthMeter.style.width = '0%';
+                strengthText.textContent = '';
                 return;
             }
             
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showError(errorDiv, 'Please enter a valid email address');
-                return;
-            }
+            const check = checkPasswordStrength(password);
+            const percentage = (check.strength / 4) * 100;
             
-            const passwordCheck = checkPasswordStrength(password);
-            if (!passwordCheck.isStrong) {
-                showError(errorDiv, passwordCheck.feedback);
-                return;
-            }
+            strengthMeter.style.width = percentage + '%';
             
-            if (password !== confirmPassword) {
-                showError(errorDiv, 'Passwords do not match');
-                return;
-            }
-            
-            if (!termsChecked) {
-                showError(errorDiv, 'You must accept the terms and conditions');
-                return;
-            }
-            
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-            
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: fullName,
-                        email: email,
-                        password: password
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showError(errorDiv, 'Account created successfully! Redirecting...', 'success');
-                    setTimeout(() => {
-                        this.reset();
-                        showLoginForm();
-                        const loginError = document.getElementById('errorMessage');
-                        showError(loginError, 'Registration successful! Please sign in.', 'success');
-                    }, 1500);
-                } else {
-                    showError(errorDiv, data.message);
-                }
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                showError(errorDiv, 'An error occurred during registration. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
+            if (check.strength <= 1) {
+                strengthMeter.style.background = '#e74c3c';
+                strengthText.textContent = 'Weak';
+                strengthText.style.color = '#e74c3c';
+            } else if (check.strength <= 2) {
+                strengthMeter.style.background = '#f39c12';
+                strengthText.textContent = 'Fair';
+                strengthText.style.color = '#f39c12';
+            } else if (check.strength <= 3) {
+                strengthMeter.style.background = '#f1c40f';
+                strengthText.textContent = 'Good';
+                strengthText.style.color = '#f1c40f';
+            } else {
+                strengthMeter.style.background = '#27ae60';
+                strengthText.textContent = 'Strong';
+                strengthText.style.color = '#27ae60';
             }
         });
         
-        function showError(errorDiv, message, type = 'error') {
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
+        // Message display functions
+        function showMessage(message, type = 'error') {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
             
-            // Set appropriate styling based on message type
             if (type === 'success') {
-                errorDiv.style.backgroundColor = '#d4edda';
-                errorDiv.style.color = '#155724';
-                errorDiv.style.border = '1px solid #c3e6cb';
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
             } else {
-                errorDiv.style.backgroundColor = '#f8d7da';
-                errorDiv.style.color = '#721c24';
-                errorDiv.style.border = '1px solid #f5c6cb';
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
             }
             
-            // Hide error after 5 seconds for error messages, 3 seconds for success
-            const timeout = type === 'success' ? 3000 : 5000;
             setTimeout(() => {
-                if (errorDiv.textContent === message) {  // Only hide if message hasn't changed
+                if (type === 'error') {
                     errorDiv.style.display = 'none';
                 }
-            }, timeout);
-            
-            // Scroll to the error message
-            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 5000);
+        }
+        
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
     </script>
-    <!-- Auth Script -->
+    
     <script src="js/auth.js"></script>
 </body>
 </html>

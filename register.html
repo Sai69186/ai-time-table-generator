@@ -191,30 +191,33 @@
                     registerLoading.style.display = 'block';
                     
                     try {
-                        // Simulate API call delay
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        const response = await fetch('http://localhost:3000/api/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: `${firstName} ${lastName}`,
+                                email: email,
+                                password: password
+                            })
+                        });
                         
-                        // Create user data
-                        const userData = {
-                            name: `${firstName} ${lastName}`,
-                            email,
-                            password,
-                            role: userType
-                        };
+                        const data = await response.json();
                         
-                        const result = Auth.register(userData);
-                        
-                        if (result.success) {
+                        if (response.ok && data.success) {
+                            localStorage.setItem('token', data.access_token);
+                            localStorage.setItem('user', JSON.stringify(data.user));
                             showSuccess('Registration successful! Redirecting...');
                             setTimeout(() => {
                                 window.location.href = 'index.html';
                             }, 1500);
                         } else {
-                            showError(result.message || 'Registration failed. Please try again.');
+                            showError(data.detail || data.message || 'Registration failed. Please try again.');
                         }
                     } catch (error) {
                         console.error('Registration error:', error);
-                        showError('An error occurred. Please try again.');
+                        showError('Network error. Please check if the server is running.');
                     } finally {
                         registerBtn.disabled = false;
                         registerLoading.style.display = 'none';

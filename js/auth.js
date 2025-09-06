@@ -1,7 +1,6 @@
 // Authentication Module
 const Auth = (function() {
-    // Current user data
-    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    const API_BASE_URL = 'http://localhost:3000/api';
     
     // User roles
     const ROLES = {
@@ -10,96 +9,205 @@ const Auth = (function() {
         STUDENT: 'student'
     };
 
+    // Get token from localStorage
+    function getToken() {
+        return localStorage.getItem('token');
+    }
+
+    // Get current user from localStorage
+    function getCurrentUser() {
+        const userStr = localStorage.getItem('user');
+        return userStr ? JSON.parse(userStr) : null;
+    }
+
     // Check if user is authenticated
     function isAuthenticated() {
-        return currentUser !== null;
+        const token = getToken();
+        const user = getCurrentUser();
+        return token && user;
     }
 
-    // Get current user
-    function getCurrentUser() {
-        return currentUser;
-    }
-
-    // Login function
-    function login(email, password) {
-        // In a real app, this would be an API call
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const user = users.find(u => u.email === email && u.password === password);
-        
-        if (user) {
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            return true;
-        }
-        return false;
-    }
-
-    // Register new user
-    function register(userData) {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        
-        // Check if user already exists
-        if (users.some(u => u.email === userData.email)) {
-            return { success: false, message: 'User already exists' };
+    // Make authenticated API request
+    async function makeAuthenticatedRequest(url, options = {}) {
+        const token = getToken();
+        if (!token) {
+            throw new Error('No authentication token');
         }
 
-        // Add new user
-        const newUser = {
-            id: 'user-' + Date.now(),
-            ...userData,
-            role: ROLES.TEACHER // Default role
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
         };
 
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // Auto login
-        currentUser = newUser;
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-        
-        return { success: true, user: newUser };
+        const response = await fetch(`${API_BASE_URL}${url}`, {
+            ...options,
+            headers
+        });
+
+        if (response.status === 401) {
+            // Token expired or invalid
+            logout();
+            throw new Error('Authentication failed');
+        }
+
+        return response;
+    }
+
+    // Verify current token
+    async function verifyToken() {
+        try {
+            const token = getToken();
+            if (!token) return false;
+            
+            const response = await makeAuthenticatedRequest('/verify');
+            const data = await response.json();
+            
+            return response.ok && data.success;
+        } catch (error) {
+            console.error('Token verification failed:', error);
+            return false;
+        }
     }
 
     // Logout function
     function logout() {
-        currentUser = null;
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = 'login.html';
     }
 
     // Check if user has required role
     function hasRole(requiredRole) {
-        if (!currentUser) return false;
-        return currentUser.role === requiredRole;
+        const user = getCurrentUser();
+        if (!user) return false;
+        return user.role === requiredRole;
+    }
+
+    // Get sections
+    async function getSections() {
+        try {
+            const response = await makeAuthenticatedRequest('/sections');
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error('Failed to fetch sections:', error);
+            return [];
+        }
+    }
+
+    // Create section
+    async function createSection(sectionData) {
+        try {
+            const response = await makeAuthenticatedRequest('/sections', {
+                method: 'POST',
+                body: JSON.stringify(sectionData)
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Failed to create section:', error);
+            throw error;
+        }
+    }
+
+    // Get courses by section
+    async function getCoursesBySection(sectionId) {
+        try {
+            const response = await makeAuthenticatedRequest(`/sections/${sectionId}/courses`);
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error('Failed to fetch courses:', error);
+            return [];
+        }
+    }
+
+    // Create course
+    async function createCourse(courseData) {
+        try {
+            const response = await makeAuthenticatedRequest('/courses', {
+                method: 'POST',
+                body: JSON.stringify(courseData)
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Failed to create course:', error);
+            throw error;
+        }
     }
 
     return {
         isAuthenticated,
         getCurrentUser,
-        login,
-        register,
+        getToken,
+        verifyToken,
         logout,
         hasRole,
+        getSections,
+        createSection,
+        getCoursesBySection,
+        createCourse,
+        makeAuthenticatedRequest,
         ROLES
     };
 })();
 
 // Initialize auth on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Protect routes that require authentication
     const protectedRoutes = ['timetable-generator.html', 'profile.html'];
     const currentPage = window.location.pathname.split('/').pop();
     
-    if (protectedRoutes.includes(currentPage) && !Auth.isAuthenticated()) {
-        window.location.href = 'login.html';
+    // Check authentication status
+    const isAuth = Auth.isAuthenticated();
+    
+    if (protectedRoutes.includes(currentPage)) {
+        if (!isAuth) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // Verify token is still valid
+        const tokenValid = await Auth.verifyToken();
+        if (!tokenValid) {
+            Auth.logout();
+            return;
+        }
     }
     
-    // Update UI based on authentication state
-    const authElements = document.querySelectorAll('[data-auth]');
-    authElements.forEach(el => {
-        const authState = el.getAttribute('data-auth');
-        const shouldShow = (authState === 'authenticated' && Auth.isAuthenticated()) || 
-                         (authState === 'unauthenticated' && !Auth.isAuthenticated());
-        el.style.display = shouldShow ? 'block' : 'none';
-    });
+    // Update navigation based on auth state
+    updateNavigation(isAuth);
+    
+    // Setup logout handler
+    const signoutBtn = document.querySelector('.signout-btn');
+    if (signoutBtn) {
+        signoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            Auth.logout();
+        });
+    }
 });
+
+// Update navigation based on authentication state
+function updateNavigation(isAuthenticated) {
+    const loginLink = document.querySelector('.login-link');
+    const signoutBtn = document.querySelector('.signout-btn');
+    
+    if (isAuthenticated) {
+        if (loginLink) loginLink.style.display = 'none';
+        if (signoutBtn) signoutBtn.style.display = 'block';
+        
+        const user = Auth.getCurrentUser();
+        if (user) {
+            const userElements = document.querySelectorAll('.user-name');
+            userElements.forEach(el => {
+                el.textContent = user.name;
+            });
+        }
+    } else {
+        if (loginLink) loginLink.style.display = 'block';
+        if (signoutBtn) signoutBtn.style.display = 'none';
+    }
+}

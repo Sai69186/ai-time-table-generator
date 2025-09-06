@@ -89,6 +89,8 @@ p {
   vertical-align: middle;
   user-select: none;
   line-height: 1.5;
+  text-decoration: none;
+  margin: 0.25rem;
 }
 
 .btn-primary {
@@ -105,6 +107,38 @@ p {
 .btn-secondary {
   background-color: #6c757d;
   color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+#welcomeSection, #userSection {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+#welcomeSection p, #userSection p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--gray-color);
 }
 
 .btn-success {

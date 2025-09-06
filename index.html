@@ -16,17 +16,35 @@
             <ul class="nav-links">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="timetable-generator.html">Timetable Generator</a></li>
-                <li><a href="login.html">Login</a></li>
+                <li class="login-link"><a href="login.html">Login</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="#" class="signout-btn">Sign Out</a></li>
+                <li><a href="#" class="signout-btn" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a></li>
             </ul>
         </nav>
     </header>
 
     <main>
         <div class="container">
-            <h1>Welcome to AI Random Time Table Generator</h1>
-            <button id="generateBtn" class="generate-btn">Generate Time Table</button>
+            <div id="welcomeSection">
+                <h1>Welcome to AI Random Time Table Generator</h1>
+                <p>Create intelligent, conflict-free timetables for your educational institution</p>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn btn-primary">Get Started</a>
+                    <a href="about.html" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            
+            <div id="userSection" style="display: none;">
+                <h1>Welcome back, <span class="user-name">User</span>!</h1>
+                <p>Ready to create your next timetable?</p>
+                <div class="action-buttons">
+                    <a href="timetable-generator.html" class="btn btn-primary">Generate Timetable</a>
+                    <a href="about.html" class="btn btn-secondary">View Features</a>
+                </div>
+            </div>
+            
             <div id="timetable" class="timetable">
                 <!-- Timetable will be generated here -->
             </div>
@@ -37,6 +55,30 @@
         <p>All rights reserved by @Vignan Lara</p>
     </footer>
 
+    <script src="js/auth.js"></script>
     <script src="script.js"></script>
+    
+    <script>
+        // Update UI based on authentication status
+        document.addEventListener('DOMContentLoaded', function() {
+            const isAuthenticated = Auth.isAuthenticated();
+            const welcomeSection = document.getElementById('welcomeSection');
+            const userSection = document.getElementById('userSection');
+            const authButtons = document.getElementById('authButtons');
+            
+            if (isAuthenticated) {
+                welcomeSection.style.display = 'none';
+                userSection.style.display = 'block';
+                
+                const user = Auth.getCurrentUser();
+                if (user) {
+                    document.querySelector('.user-name').textContent = user.name;
+                }
+            } else {
+                welcomeSection.style.display = 'block';
+                userSection.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
