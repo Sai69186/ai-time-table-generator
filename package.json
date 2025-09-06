@@ -23,12 +23,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ai-timetable-generator.git"
+    "url": "https://github.com/Sai69186/ai-time-table-generator.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ai-timetable-generator/issues"
+    "url": "https://github.com/Sai69186/ai-time-table-generator/issues"
   },
-  "homepage": "https://github.com/yourusername/ai-timetable-generator#readme",
+  "homepage": "https://github.com/Sai69186/ai-time-table-generator#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",

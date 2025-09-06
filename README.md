@@ -22,8 +22,8 @@ A modern web-based AI-powered timetable generation system designed for education
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ai-timetable-generator.git
-cd ai-timetable-generator
+git clone https://github.com/Sai69186/ai-time-table-generator.git
+cd ai-time-table-generator
 ```
 
 2. Install dependencies:
