@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AI TimeTable</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .login-header p {
+            color: #7f8c8d;
+            margin-top: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            background-color: #2980b9;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .login-footer a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background-color: #fde8e6;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="images/download.jpeg" alt="AI TimeTable Logo" class="logo-img">
+                <span>AI TimeTable</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                <li class="login-link"><a href="login.html" class="active">Login</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="#" class="signout-btn" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to access your AI-powered timetable</p>
+            </div>
+            
+            <div id="errorMessage" class="error-message">
+                Invalid email or password. Please try again.
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <div style="text-align: right; margin-top: 0.5rem;">
+                        <a href="#" style="font-size: 0.85rem; color: #7f8c8d;">Forgot password?</a>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login">Sign In</button>
+                
+                <div class="login-footer">
+                    Don't have an account? <a href="#" id="signupLink">Sign up</a>
+                </div>
+            </form>
+            
+            <form id="signupFormElement" style="display: none;">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPassword">Password <small>(min 8 characters, include number & special char)</small></label>
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="signupPassword" class="form-control" placeholder="Create a strong password" required>
+                    <div class="password-strength" style="margin-top: 5px; font-size: 0.85rem;">
+                        <div class="strength-meter" style="height: 5px; background: #eee; border-radius: 5px; margin-bottom: 5px; overflow: hidden;">
+                            <div class="strength-meter-fill" style="height: 100%; width: 0%; background: #e74c3c; transition: width 0.3s, background 0.3s;"></div>
+                        </div>
+                        <div class="strength-text" style="color: #7f8c8d;"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="terms">
+                        <input type="checkbox" id="terms" required>
+                        I agree to the terms and conditions
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-login">Sign Up</button>
+                
+                <div class="login-footer">
+                    Already have an account? <a href="#" id="loginLink">Login</a>
+                </div>
+            </form>
+            
+            <div id="signupError" class="error-message"></div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            // In a real application, you would send this data to your server
+            console.log('Login attempt with:', { email, password });
+            
+            // Simulate successful login
+            setTimeout(() => {
+                // Redirect to dashboard or home page after successful login
+                window.location.href = 'index.html';
+            }, 1000);
+        });
+        
+        // Sign up link handler
+        document.getElementById('signupLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSignupForm();
+        });
+        
+        // Login link handler
+        document.getElementById('loginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
+        });
+        
+        function showSignupForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupFormElement').style.display = 'block';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupFormElement').style.display = 'none';
+        }
+        
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            const hasMinLength = password.length >= 8;
+            const hasNumber = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const hasUpperCase = /[A-Z]/.test(password);
+            
+            let strength = 0;
+            let feedback = [];
+            
+            if (hasMinLength) strength++;
+            if (hasNumber) strength++;
+            if (hasSpecialChar) strength++;
+            if (hasUpperCase) strength++;
+            
+            if (!hasMinLength) feedback.push('at least 8 characters');
+            if (!hasNumber) feedback.push('at least one number');
+            if (!hasSpecialChar) feedback.push('at least one special character');
+            if (!hasUpperCase) feedback.push('at least one uppercase letter');
+            
+            return {
+                strength: strength,
+                isStrong: strength >= 3,
+                feedback: feedback.length > 0 ? 'Password must contain: ' + feedback.join(', ') : ''
+            };
+        }
+        
+        // Signup form submission
+        document.getElementById('signupFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsChecked = document.getElementById('terms').checked;
+            const errorDiv = document.getElementById('signupError');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Reset error state
+            errorDiv.textContent = '';
+            errorDiv.style.display = 'none';
+            
+            // Validation
+            if (!fullName || !email || !password || !confirmPassword) {
+                showError(errorDiv, 'Please fill in all fields');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError(errorDiv, 'Please enter a valid email address');
+                return;
+            }
+            
+            // Password strength check
+            const passwordCheck = checkPasswordStrength(password);
+            if (!passwordCheck.isStrong) {
+                showError(errorDiv, passwordCheck.feedback);
+                return;
+            }
+            
+            // Confirm password match
+            if (password !== confirmPassword) {
+                showError(errorDiv, 'Passwords do not match');
+                return;
+            }
+            
+            // Terms and conditions check
+            if (!termsChecked) {
+                showError(errorDiv, 'You must accept the terms and conditions');
+                return;
+            }
+            
+            // Disable submit button and show loading state
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            
+            try {
+                // In a real application, you would send this data to your backend
+                // const response = await fetch('/api/auth/register', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({
+                //         name: fullName,
+                //         email: email,
+                //         password: password
+                //     })
+                // });
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Check response status in a real implementation
+                // if (!response.ok) {
+                //     const errorData = await response.json();
+                //     throw new Error(errorData.message || 'Registration failed');
+                // }
+                
+                // Show success message
+                showError(errorDiv, 'Account created successfully! Redirecting...', 'success');
+                
+                // In a real app, you might want to automatically log the user in
+                // or redirect them to the login page
+                setTimeout(() => {
+                    // Reset form
+                    this.reset();
+                    // Show login form
+                    showLoginForm();
+                    // Show success message on login form
+                    const loginError = document.getElementById('errorMessage');
+                    showError(loginError, 'Registration successful! Please sign in.', 'success');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError(errorDiv, error.message || 'An error occurred during registration. Please try again.');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+        
+        function showError(errorDiv, message, type = 'error') {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Set appropriate styling based on message type
+            if (type === 'success') {
+                errorDiv.style.backgroundColor = '#d4edda';
+                errorDiv.style.color = '#155724';
+                errorDiv.style.border = '1px solid #c3e6cb';
+            } else {
+                errorDiv.style.backgroundColor = '#f8d7da';
+                errorDiv.style.color = '#721c24';
+                errorDiv.style.border = '1px solid #f5c6cb';
+            }
+            
+            // Hide error after 5 seconds for error messages, 3 seconds for success
+            const timeout = type === 'success' ? 3000 : 5000;
+            setTimeout(() => {
+                if (errorDiv.textContent === message) {  // Only hide if message hasn't changed
+                    errorDiv.style.display = 'none';
+                }
+            }, timeout);
+            
+            // Scroll to the error message
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+    <!-- Auth Script -->
+    <script src="js/auth.js"></script>
+</body>
+</html>

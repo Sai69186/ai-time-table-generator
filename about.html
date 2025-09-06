@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - AI TimeTable Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        .about-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 3rem 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .about-section, .contact-section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .about-section h2, .contact-section h2 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .about-section h2:after, .contact-section h2:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+        }
+        
+        .about-section h3 {
+            color: var(--primary-color);
+            margin: 2rem 0 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .about-section p, .contact-section p {
+            color: var(--text-color);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        
+        .about-section ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+        
+        .about-section ul li {
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .about-section ul li:before {
+            content: '✓';
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            border: 1px solid #eee;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .contact-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.2rem;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+        
+        .contact-card h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent-color);
+        }
+        
+        .contact-card p {
+            margin: 0.8rem 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-card p strong {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+            min-width: 100px;
+            display: inline-block;
+        }
+        
+        .contact-card a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .contact-card a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        .contact-card a i {
+            margin-right: 0.5rem;
+        }
+        
+        .visit-us {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .about-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-section h2, .contact-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .about-section h2, .contact-section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-card p {
+            margin: 0.5rem 0;
+            color: #555;
+        }
+        
+        .contact-card a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .contact-card a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .about-container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="images/download.jpeg" alt="AI TimeTable Logo" class="logo-img">
+                <span>AI TimeTable</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="about-container">
+            <div class="about-section">
+                <h2>About AI TimeTable Generator</h2>
+                <p>Welcome to AI TimeTable Generator, an intelligent solution designed to revolutionize the way educational institutions and individuals create and manage their schedules. Our platform leverages cutting-edge artificial intelligence to generate optimized timetables that maximize efficiency and minimize conflicts.</p>
+                
+                <h3>Our Mission</h3>
+                <p>Our mission is to simplify the complex process of timetable creation, saving valuable time for educational institutions, teachers, and students alike. We believe in harnessing the power of AI to create schedules that are not only efficient but also flexible and easy to manage.</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>AI-powered timetable generation</li>
+                    <li>Conflict-free scheduling</li>
+                    <li>Customizable time slots and constraints</li>
+                    <li>User-friendly interface</li>
+                    <li>Real-time updates and modifications</li>
+                </ul>
+            </div>
+            
+            <div class="contact-section">
+                <h2>Contact Us</h2>
+                <p>Have questions or need assistance? Our team is here to help you with any inquiries or support you may need.</p>
+                
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <h3>General Inquiries</h3>
+                        <p><strong>Email:</strong> <a href="mailto:info@aitimetable.com">Batch B6</a></p>
+                        <p><strong>Phone:</strong>+91 8885309616 </p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3>Technical Support</h3>
+                        <p><strong>Email:</strong> <a href="mailto:support@aitimetable.com">aitimetablegenerator@gmail.com</a></p>
+                        <p><strong>Phone:</strong> +91 6912345560</p>
+                        <p><strong>Hours:</strong> Mon-Fri, 9:00 AM - 6:00 PM IST</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3>Business Partnerships</h3>
+                        <p><strong>Email:</strong> <a href="mailto:partnerships@aitimetable.com">aitimetablegenerator@gmail.com</a></p>
+                        <p><strong>Phone:</strong> +91 6123457890</p>
+                    </div>
+                </div>
+                
+                <div class="visit-us" style="margin-top: 2rem;">
+                    <h3>Visit Our Office</h3>
+                    <p>vignan's lara institute of technology and sciences<br>cse department<br>vadlamudi<br>Andhra Pradesh</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 AI TimeTable Generator. All rights reserved by @ Vignan Lara.</p>
+    </footer>
+</body>
+</html>

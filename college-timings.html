@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Timings - AI TimeTable Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .timing-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        .form-section h3 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-section h3 i {
+            color: #4361ee;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .day-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .day-checkbox:hover {
+            background: #f8f9fa;
+            border-color: #4361ee;
+        }
+        .day-checkbox input[type="checkbox"] {
+            margin: 0;
+        }
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .time-inputs {
+                grid-template-columns: 1fr;
+            }
+            .days-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <header class="header">
+        <nav class="navbar container">
+            <a href="index.html" class="navbar-brand">
+                <img src="images/download.jpeg" alt="AI TimeTable Logo" class="logo-img">
+                <span>College Timings</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                <li><a href="college-timings.html" class="active">College Timings</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="section">
+    <div class="container">
+        <h1 class="text-center mb-4">College Timings</h1>
+        <p class="text-center text-muted mb-5">Set your institution's schedule and timing preferences</p>
+        
+        <form id="timingForm" class="timing-form">
+            <!-- College Hours -->
+            <div class="form-section">
+                <h3><i class="fas fa-clock"></i> College Hours</h3>
+                <div class="time-inputs">
+                    <div class="form-group">
+                        <label for="collegeStartTime" class="form-label">Start Time</label>
+                        <input type="time" id="collegeStartTime" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="collegeEndTime" class="form-label">End Time</label>
+                        <input type="time" id="collegeEndTime" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Working Days -->
+            <div class="form-section">
+                <h3><i class="far fa-calendar-alt"></i> Working Days</h3>
+                <p class="text-muted mb-3">Select the days your college is open</p>
+                <div class="days-grid">
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="monday" checked>
+                        Monday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="tuesday" checked>
+                        Tuesday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="wednesday" checked>
+                        Wednesday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="thursday" checked>
+                        Thursday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="friday" checked>
+                        Friday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="saturday">
+                        Saturday
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" name="workingDays" value="sunday">
+                        Sunday
+                    </label>
+                </div>
+            </div>
+
+            <!-- Period Settings -->
+            <div class="form-section">
+                <h3><i class="fas fa-chalkboard-teacher"></i> Class Periods</h3>
+                <div class="form-group">
+                    <label for="periodDuration" class="form-label">Duration of Each Period (minutes)</label>
+                    <input type="number" id="periodDuration" class="form-control" min="30" max="120" value="60" required>
+                    <small class="text-muted">Typically between 45-90 minutes</small>
+                </div>
+            </div>
+
+            <!-- Breaks -->
+            <div class="form-section">
+                <h3><i class="fas fa-utensils"></i> Break Times</h3>
+                <div class="form-group mb-4">
+                    <label class="form-label">Lunch Break</label>
+                    <div class="time-inputs">
+                        <div class="form-group">
+                            <input type="time" id="lunchStart" class="form-control" required>
+                            <small class="text-muted">Start time</small>
+                        </div>
+                        <div class="form-group">
+                            <input type="time" id="lunchEnd" class="form-control" required>
+                            <small class="text-muted">End time</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions d-flex justify-content-between mt-5">
+                <button type="button" class="btn btn-outline" id="resetBtn">
+                    <i class="fas fa-undo"></i> Reset to Default
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Timings
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+    <footer class="footer mt-5">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h5>AI TimeTable Generator</h5>
+                <p>Streamlining academic scheduling for educational institutions.</p>
+            </div>
+            <div class="footer-section">
+                <h5>Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Vignan Lara. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved timings if available
+            loadTimings();
+            
+            // Form submission
+            document.getElementById('timingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveTimings();
+                generateSchedulePreview();
+                showAlert('Timings saved successfully!', 'success');
+            });
+
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset to default timings?')) {
+                    resetToDefault();
+                    generateSchedulePreview();
+                    showAlert('Timings reset to default.', 'info');
+                }
+            });
+
+            // Generate initial schedule preview
+            generateSchedulePreview();
+
+            // Listen for changes to update preview
+            const inputs = document.querySelectorAll('#timingForm input');
+            inputs.forEach(input => {
+                input.addEventListener('change', generateSchedulePreview);
+            });
+        });
+
+        function loadTimings() {
+            // In a real app, load from localStorage or API
+            const savedTimings = JSON.parse(localStorage.getItem('collegeTimings')) || {
+                startTime: '09:00',
+                endTime: '17:00',
+                workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                periodDuration: 60,
+                lunchStart: '13:00',
+                lunchEnd: '14:00'
+            };
+
+            document.getElementById('collegeStartTime').value = savedTimings.startTime;
+            document.getElementById('collegeEndTime').value = savedTimings.endTime;
+            document.getElementById('periodDuration').value = savedTimings.periodDuration;
+            document.getElementById('lunchStart').value = savedTimings.lunchStart;
+            document.getElementById('lunchEnd').value = savedTimings.lunchEnd;
+
+            // Check the working days checkboxes
+            const checkboxes = document.querySelectorAll('input[name="workingDays"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = savedTimings.workingDays.includes(checkbox.value);
+            });
+        }
+
+        function saveTimings() {
+            const workingDays = [];
+            document.querySelectorAll('input[name="workingDays"]:checked').forEach(checkbox => {
+                workingDays.push(checkbox.value);
+            });
+
+            const timings = {
+                startTime: document.getElementById('collegeStartTime').value,
+                endTime: document.getElementById('collegeEndTime').value,
+                workingDays: workingDays,
+                periodDuration: parseInt(document.getElementById('periodDuration').value),
+                lunchStart: document.getElementById('lunchStart').value,
+                lunchEnd: document.getElementById('lunchEnd').value
+            };
+
+            // In a real app, save to localStorage or API
+            localStorage.setItem('collegeTimings', JSON.stringify(timings));
+        }
+
+        function resetToDefault() {
+            const defaultTimings = {
+                startTime: '09:00',
+                endTime: '17:00',
+                workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                periodDuration: 60,
+                lunchStart: '13:00',
+                lunchEnd: '14:00'
+            };
+
+            document.getElementById('collegeStartTime').value = defaultTimings.startTime;
+            document.getElementById('collegeEndTime').value = defaultTimings.endTime;
+            document.getElementById('periodDuration').value = defaultTimings.periodDuration;
+            document.getElementById('lunchStart').value = defaultTimings.lunchStart;
+            document.getElementById('lunchEnd').value = defaultTimings.lunchEnd;
+
+            // Update checkboxes
+            const checkboxes = document.querySelectorAll('input[name="workingDays"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = defaultTimings.workingDays.includes(checkbox.value);
+            });
+
+            // Save the default timings
+            localStorage.setItem('collegeTimings', JSON.stringify(defaultTimings));
+        }
+
+        function generateSchedulePreview() {
+            const startTime = document.getElementById('collegeStartTime').value;
+            const endTime = document.getElementById('collegeEndTime').value;
+            const periodDuration = parseInt(document.getElementById('periodDuration').value);
+            const lunchStart = document.getElementById('lunchStart').value;
+            const lunchEnd = document.getElementById('lunchEnd').value;
+
+            // Convert times to minutes since midnight for easier calculations
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+            const [lunchStartHour, lunchStartMinute] = lunchStart.split(':').map(Number);
+            const [lunchEndHour, lunchEndMinute] = lunchEnd.split(':').map(Number);
+
+            const startTotalMinutes = startHour * 60 + startMinute;
+            const endTotalMinutes = endHour * 60 + endMinute;
+            const lunchStartTotalMinutes = lunchStartHour * 60 + lunchStartMinute;
+            const lunchEndTotalMinutes = lunchEndHour * 60 + lunchEndMinute;
+
+            // Clear existing schedule
+            const scheduleBody = document.getElementById('scheduleBody');
+            scheduleBody.innerHTML = '';
+
+            let currentTime = startTotalMinutes;
+            let periodNumber = 1;
+
+            while (currentTime + periodDuration <= endTotalMinutes) {
+                const periodEnd = currentTime + periodDuration;
+                
+                // Skip if this period is during lunch
+                if (!(periodEnd <= lunchStartTotalMinutes || currentTime >= lunchEndTotalMinutes)) {
+                    currentTime = lunchEndTotalMinutes;
+                    continue;
+                }
+
+                // Format time
+                const startHour = Math.floor(currentTime / 60);
+                const startMinute = currentTime % 60;
+                const endHour = Math.floor(periodEnd / 60);
+                const endMinute = periodEnd % 60;
+
+                const startTimeStr = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                const endTimeStr = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+
+                // Create row
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${startTimeStr} - ${endTimeStr}</td>
+                    <td>Period ${periodNumber}</td>
+                    <td>${periodDuration} minutes</td>
+                `;
+                
+                scheduleBody.appendChild(row);
+                
+                currentTime = periodEnd;
+                periodNumber++;
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            // In a real app, you might want to show a nice toast notification
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+    </script>
+</body>
+</html>

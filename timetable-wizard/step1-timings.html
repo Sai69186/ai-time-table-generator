@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: College Timings - AI TimeTable</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .wizard-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section h3 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-section h3 i {
+            color: #4361ee;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .btn.next-btn {
+            background: #2ecc71;
+            float: right;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .timing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .timing-card {
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="../images/download.jpeg" alt="AI TimeTable Logo" class="logo-img">
+                <span>AI TimeTable</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="#" class="active">Timetable Wizard</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="#" class="signout-btn">Sign Out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="wizard-container">
+            <h1>College Timings</h1>
+            <p>Please set up your college timings for the timetable.</p>
+            
+            <form id="timingsForm">
+                <div class="timing-grid">
+                    <div class="timing-card">
+                        <div class="form-group">
+                            <label for="startTime">College Start Time</label>
+                            <input type="time" id="startTime" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="timing-card">
+                        <div class="form-group">
+                            <label for="endTime">College End Time</label>
+                            <input type="time" id="endTime" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="timing-card">
+                        <div class="form-group">
+                            <label for="periodDuration">Period Duration (minutes)</label>
+                            <input type="number" id="periodDuration" class="form-control" min="30" max="120" value="60" required>
+                        </div>
+                    </div>
+                    
+                    <div class="timing-card">
+                        <div class="form-group">
+                            <label for="breakDuration">Break Duration (minutes)</label>
+                            <input type="number" id="breakDuration" class="form-control" min="5" max="60" value="15" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Working Days</label>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="monday" checked> Monday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="tuesday" checked> Tuesday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="wednesday" checked> Wednesday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="thursday" checked> Thursday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="friday" checked> Friday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="saturday"> Saturday
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="workingDays" value="sunday"> Sunday
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                    <a href="../timetable-generator.html" class="btn" style="margin-right: 1rem;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn next-btn">
+                        Next: Add Sections <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('timingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const timings = {
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                periodDuration: parseInt(document.getElementById('periodDuration').value),
+                breakDuration: parseInt(document.getElementById('breakDuration').value),
+                workingDays: Array.from(document.querySelectorAll('input[name="workingDays"]:checked')).map(cb => cb.value)
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('timetableTimings', JSON.stringify(timings));
+            
+            // Navigate to next step
+            window.location.href = 'step2-sections.html';
+        });
+        
+        // Set default times
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            now.setHours(9, 0, 0, 0);
+            document.getElementById('startTime').value = '09:00';
+            
+            now.setHours(17, 0, 0, 0);
+            document.getElementById('endTime').value = '17:00';
+        });
+    </script>
+</body>
+</html>

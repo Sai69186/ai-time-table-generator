@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4: Generate Timetable - AI TimeTable</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .wizard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .timetable-options {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-end;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .timetable-container {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        .timetable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .timetable th, .timetable td {
+            border: 1px solid #e0e0e0;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        
+        .timetable th {
+            background-color: #f2f6f9;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .timetable td {
+            min-width: 120px;
+            height: 80px;
+            vertical-align: top;
+        }
+        
+        .time-slot {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+        }
+        
+        .course-slot {
+            background: #e8f4fc;
+            border-left: 3px solid #3498db;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+        
+        .course-code {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .course-teacher {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 0.25rem;
+        }
+        
+        .no-courses {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .success-message i {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="../images/download.jpeg" alt="AI TimeTable Logo" class="logo-img">
+                <span>AI TimeTable</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="#" class="active">Timetable Wizard</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="#" class="signout-btn">Sign Out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="wizard-container">
+            <h1>Generate Timetable</h1>
+            <p>Review and generate your timetable. Select a section to view or generate the timetable.</p>
+            
+            <div id="timetableOptions" class="timetable-options">
+                <div class="form-group">
+                    <label for="timetableSection">Select Section</label>
+                    <select id="timetableSection" class="form-select">
+                        <!-- Sections will be populated here -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timetableName">Timetable Name</label>
+                    <input type="text" id="timetableName" class="form-control" placeholder="e.g., Fall 2023 Timetable">
+                </div>
+                
+                <button type="button" id="generateBtn" class="btn btn-primary">
+                    <i class="fas fa-magic"></i> Generate Timetable
+                </button>
+            </div>
+            
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating timetable. This may take a moment...</p>
+            </div>
+            
+            <div id="timetableContainer" class="timetable-container">
+                <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                    <i class="fas fa-calendar-alt" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem;"></i>
+                    <p>Select a section and click 'Generate Timetable' to get started.</p>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="step3-courses.html" class="btn">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </a>
+                <button type="button" id="saveBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-save"></i> Save Timetable
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let sections = [];
+            let courses = [];
+            let timetables = [];
+            let currentTimetable = null;
+            
+            const sectionSelect = document.getElementById('timetableSection');
+            const generateBtn = document.getElementById('generateBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const timetableContainer = document.getElementById('timetableContainer');
+            
+            // Load data
+            function loadData() {
+                // Load sections
+                const savedSections = JSON.parse(localStorage.getItem('timetableSections') || '[]');
+                sections = savedSections;
+                
+                // Load courses
+                const savedCourses = JSON.parse(localStorage.getItem('timetableCourses') || '[]');
+                courses = savedCourses;
+                
+                // Load timetables if any
+                const savedTimetables = JSON.parse(localStorage.getItem('timetableGenerated') || '[]');
+                timetables = savedTimetables;
+                
+                // Update UI
+                updateSectionDropdown();
+                
+                // Select first section by default
+                if (sections.length > 0) {
+                    sectionSelect.value = sections[0].id;
+                }
+                
+                // Check if we have a timetable to show
+                if (timetables.length > 0) {
+                    currentTimetable = timetables[0];
+                    renderTimetable(currentTimetable);
+                    saveBtn.disabled = false;
+                }
+            }
+            
+            // Update section dropdown
+            function updateSectionDropdown() {
+                sectionSelect.innerHTML = sections.map(section => 
+                    `<option value="${section.id}">${section.name}</option>`
+                ).join('');
+            }
+            
+            // Generate a sample timetable (in a real app, this would be more sophisticated)
+            function generateTimetable(sectionId) {
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                timetableContainer.innerHTML = '';
+                
+                // Simulate API call/processing delay
+                setTimeout(() => {
+                    const section = sections.find(s => s.id === sectionId);
+                    const sectionCourses = courses.filter(course => course.sectionId === sectionId);
+                    
+                    // In a real app, this would be a proper scheduling algorithm
+                    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                    const timeSlots = [
+                        { start: '09:00', end: '10:00' },
+                        { start: '10:00', end: '11:00' },
+                        { start: '11:15', end: '12:15' }, // Break from 11:00-11:15
+                        { start: '12:15', end: '13:15' },
+                        { start: '14:00', end: '15:00' }, // Lunch break
+                        { start: '15:00', end: '16:00' },
+                    ];
+                    
+                    // Distribute courses across the week
+                    const timetable = {
+                        id: 'TT' + Date.now().toString().slice(-6),
+                        sectionId,
+                        sectionName: section ? section.name : 'Unknown Section',
+                        name: document.getElementById('timetableName').value || 'My Timetable',
+                        generatedAt: new Date().toISOString(),
+                        days,
+                        timeSlots,
+                        schedule: {}
+                    };
+                    
+                    // Simple distribution of courses
+                    sectionCourses.forEach((course, index) => {
+                        const dayIndex = index % days.length;
+                        const timeIndex = Math.floor(index / days.length) % timeSlots.length;
+                        
+                        const day = days[dayIndex];
+                        const timeSlot = timeSlots[timeIndex];
+                        
+                        if (!timetable.schedule[day]) {
+                            timetable.schedule[day] = {};
+                        }
+                        
+                        timetable.schedule[day][timeSlot.start] = {
+                            courseId: course.id,
+                            courseCode: course.code,
+                            courseName: course.name,
+                            teacher: course.teacher,
+                            duration: 60 // Default duration in minutes
+                        };
+                    });
+                    
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                    
+                    // Save and render the timetable
+                    currentTimetable = timetable;
+                    renderTimetable(timetable);
+                    saveBtn.disabled = false;
+                    
+                }, 1500); // Simulate processing time
+            }
+            
+            // Render timetable
+            function renderTimetable(timetable) {
+                if (!timetable) {
+                    timetableContainer.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                            <i class="fas fa-calendar-alt" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem;"></i>
+                            <p>No timetable generated yet. Click 'Generate Timetable' to create one.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = `
+                    <h2>${timetable.name} - ${timetable.sectionName}</h2>
+                    <div class="table-responsive">
+                        <table class="timetable">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    ${timetable.days.map(day => `<th>${day}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                timetable.timeSlots.forEach(slot => {
+                    html += `
+                        <tr>
+                            <td>
+                                <div class="time-slot">${slot.start} - ${slot.end}</div>
+                            </td>
+                    `;
+                    
+                    timetable.days.forEach(day => {
+                        const schedule = timetable.schedule[day] || {};
+                        const course = schedule[slot.start];
+                        
+                        html += '<td>';
+                        if (course) {
+                            html += `
+                                <div class="course-slot">
+                                    <div class="course-code">${course.courseCode}</div>
+                                    <div class="course-teacher">${course.teacher}</div>
+                                </div>
+                            `;
+                        }
+                        html += '</td>';
+                    });
+                    
+                    html += '</tr>';
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                timetableContainer.innerHTML = html;
+            }
+            
+            // Save timetable
+            function saveTimetable() {
+                if (!currentTimetable) return;
+                
+                // Add to timetables if not already there
+                const exists = timetables.some(tt => 
+                    tt.sectionId === currentTimetable.sectionId && 
+                    tt.generatedAt === currentTimetable.generatedAt
+                );
+                
+                if (!exists) {
+                    timetables.push(currentTimetable);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('timetableGenerated', JSON.stringify(timetables));
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'success-message';
+                successMsg.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3 style="margin: 0 0 0.25rem 0;">Timetable Saved Successfully!</h3>
+                        <p style="margin: 0;">Your timetable has been saved and can be viewed anytime.</p>
+                    </div>
+                `;
+                
+                // Insert before the timetable container
+                timetableContainer.parentNode.insertBefore(successMsg, timetableContainer);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    successMsg.style.opacity = '0';
+                    setTimeout(() => successMsg.remove(), 300);
+                }, 5000);
+            }
+            
+            // Event listeners
+            generateBtn.addEventListener('click', function() {
+                const sectionId = sectionSelect.value;
+                if (sectionId) {
+                    generateTimetable(sectionId);
+                }
+            });
+            
+            saveBtn.addEventListener('click', saveTimetable);
+            
+            // Initialize
+            loadData();
+        });
+    </script>
+</body>
+</html>
