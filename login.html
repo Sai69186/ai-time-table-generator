@@ -190,27 +190,41 @@
     </main>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Get form values
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
             
-            // Basic validation
             if (!email || !password) {
                 showError('Please fill in all fields');
                 return;
             }
             
-            // In a real application, you would send this data to your server
-            console.log('Login attempt with:', { email, password });
-            
-            // Simulate successful login
-            setTimeout(() => {
-                // Redirect to dashboard or home page after successful login
-                window.location.href = 'index.html';
-            }, 1000);
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = data.message;
+                }
+            } catch (error) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Login failed. Please try again.';
+            }
         });
         
         // Sign up link handler
@@ -274,90 +288,71 @@
             const errorDiv = document.getElementById('signupError');
             const submitBtn = this.querySelector('button[type="submit"]');
             
-            // Reset error state
             errorDiv.textContent = '';
             errorDiv.style.display = 'none';
             
-            // Validation
             if (!fullName || !email || !password || !confirmPassword) {
                 showError(errorDiv, 'Please fill in all fields');
                 return;
             }
             
-            // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showError(errorDiv, 'Please enter a valid email address');
                 return;
             }
             
-            // Password strength check
             const passwordCheck = checkPasswordStrength(password);
             if (!passwordCheck.isStrong) {
                 showError(errorDiv, passwordCheck.feedback);
                 return;
             }
             
-            // Confirm password match
             if (password !== confirmPassword) {
                 showError(errorDiv, 'Passwords do not match');
                 return;
             }
             
-            // Terms and conditions check
             if (!termsChecked) {
                 showError(errorDiv, 'You must accept the terms and conditions');
                 return;
             }
             
-            // Disable submit button and show loading state
             const originalBtnText = submitBtn.textContent;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             
             try {
-                // In a real application, you would send this data to your backend
-                // const response = await fetch('/api/auth/register', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({
-                //         name: fullName,
-                //         email: email,
-                //         password: password
-                //     })
-                // });
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: fullName,
+                        email: email,
+                        password: password
+                    })
+                });
                 
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                const data = await response.json();
                 
-                // Check response status in a real implementation
-                // if (!response.ok) {
-                //     const errorData = await response.json();
-                //     throw new Error(errorData.message || 'Registration failed');
-                // }
-                
-                // Show success message
-                showError(errorDiv, 'Account created successfully! Redirecting...', 'success');
-                
-                // In a real app, you might want to automatically log the user in
-                // or redirect them to the login page
-                setTimeout(() => {
-                    // Reset form
-                    this.reset();
-                    // Show login form
-                    showLoginForm();
-                    // Show success message on login form
-                    const loginError = document.getElementById('errorMessage');
-                    showError(loginError, 'Registration successful! Please sign in.', 'success');
-                }, 1500);
+                if (data.success) {
+                    showError(errorDiv, 'Account created successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        this.reset();
+                        showLoginForm();
+                        const loginError = document.getElementById('errorMessage');
+                        showError(loginError, 'Registration successful! Please sign in.', 'success');
+                    }, 1500);
+                } else {
+                    showError(errorDiv, data.message);
+                }
                 
             } catch (error) {
                 console.error('Registration error:', error);
-                showError(errorDiv, error.message || 'An error occurred during registration. Please try again.');
+                showError(errorDiv, 'An error occurred during registration. Please try again.');
             } finally {
-                // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalBtnText;
             }
