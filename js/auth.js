@@ -31,7 +31,9 @@ const Auth = (function() {
     async function makeAuthenticatedRequest(url, options = {}) {
         const token = getToken();
         if (!token) {
-            throw new Error('No authentication token');
+            console.warn('No authentication token found');
+            window.location.href = 'login.html';
+            return null;
         }
 
         const headers = {
@@ -46,24 +48,26 @@ const Auth = (function() {
         });
 
         if (response.status === 401) {
-            // Token expired or invalid
+            console.warn('Token expired or invalid');
             logout();
-            throw new Error('Authentication failed');
+            return null;
         }
 
         return response;
     }
 
-    // Verify current token
+    // Verify current token by making a test API call
     async function verifyToken() {
         try {
             const token = getToken();
             if (!token) return false;
             
-            const response = await makeAuthenticatedRequest('/verify');
-            const data = await response.json();
+            // Test token with health endpoint
+            const response = await fetch(`${API_BASE_URL}/health`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             
-            return response.ok && data.success;
+            return response.ok;
         } catch (error) {
             console.error('Token verification failed:', error);
             return false;
@@ -87,7 +91,9 @@ const Auth = (function() {
     // Get sections
     async function getSections() {
         try {
-            const response = await makeAuthenticatedRequest('/sections');
+            const response = await makeAuthenticatedRequest('/university/sections');
+            if (!response) return [];
+            
             const data = await response.json();
             return data.success ? data.data : [];
         } catch (error) {
@@ -99,24 +105,26 @@ const Auth = (function() {
     // Create section
     async function createSection(sectionData) {
         try {
-            const response = await makeAuthenticatedRequest('/sections', {
+            const response = await makeAuthenticatedRequest('/university/sections', {
                 method: 'POST',
                 body: JSON.stringify(sectionData)
             });
+            if (!response) return { success: false, detail: 'Authentication required' };
+            
             const data = await response.json();
             return data;
         } catch (error) {
             console.error('Failed to create section:', error);
-            throw error;
+            return { success: false, detail: error.message };
         }
     }
 
     // Get courses by section
     async function getCoursesBySection(sectionId) {
         try {
-            const response = await makeAuthenticatedRequest(`/sections/${sectionId}/courses`);
+            const response = await makeAuthenticatedRequest('/university/courses');
             const data = await response.json();
-            return data.success ? data.data : [];
+            return data.success ? data.data.filter(course => course.section_id == sectionId) : [];
         } catch (error) {
             console.error('Failed to fetch courses:', error);
             return [];
@@ -126,7 +134,7 @@ const Auth = (function() {
     // Create course
     async function createCourse(courseData) {
         try {
-            const response = await makeAuthenticatedRequest('/courses', {
+            const response = await makeAuthenticatedRequest('/university/courses', {
                 method: 'POST',
                 body: JSON.stringify(courseData)
             });
@@ -169,12 +177,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
-        // Verify token is still valid
-        const tokenValid = await Auth.verifyToken();
-        if (!tokenValid) {
-            Auth.logout();
-            return;
-        }
+        // Token will be validated on first API call
+        // If invalid, user will be redirected to login
     }
     
     // Update navigation based on auth state

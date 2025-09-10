@@ -301,12 +301,38 @@
             function generateTimetable(sectionId) {
                 // Show loading indicator
                 loadingIndicator.style.display = 'block';
-                timetableContainer.innerHTML = '';
+                timetableContainer.innerHTML = 'Generating timetable...';
+                
+                // Debug: Log available data
+                console.log('All sections:', sections);
+                console.log('All courses:', courses);
+                console.log('Selected section ID:', sectionId);
                 
                 // Simulate API call/processing delay
                 setTimeout(() => {
                     const section = sections.find(s => s.id === sectionId);
                     const sectionCourses = courses.filter(course => course.sectionId === sectionId);
+                    
+                    console.log('Found section:', section);
+                    console.log('Found courses for section:', sectionCourses);
+                    
+                    if (!section) {
+                        timetableContainer.innerHTML = '<div class="error">Error: Section not found</div>';
+                        loadingIndicator.style.display = 'none';
+                        return;
+                    }
+                    
+                    if (sectionCourses.length === 0) {
+                        timetableContainer.innerHTML = `
+                            <div class="empty-state" style="text-align: center; padding: 2rem; color: #e74c3c;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>No courses found for ${section.name}</h3>
+                                <p>Please add courses to this section before generating a timetable.</p>
+                                <a href="../college-timings.html" class="btn btn-primary">Add Courses</a>
+                            </div>`;
+                        loadingIndicator.style.display = 'none';
+                        return;
+                    }
                     
                     // In a real app, this would be a proper scheduling algorithm
                     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -331,26 +357,61 @@
                         schedule: {}
                     };
                     
-                    // Simple distribution of courses
-                    sectionCourses.forEach((course, index) => {
-                        const dayIndex = index % days.length;
-                        const timeIndex = Math.floor(index / days.length) % timeSlots.length;
-                        
-                        const day = days[dayIndex];
-                        const timeSlot = timeSlots[timeIndex];
-                        
-                        if (!timetable.schedule[day]) {
-                            timetable.schedule[day] = {};
-                        }
-                        
-                        timetable.schedule[day][timeSlot.start] = {
-                            courseId: course.id,
-                            courseCode: course.code,
-                            courseName: course.name,
-                            teacher: course.teacher,
-                            duration: 60 // Default duration in minutes
-                        };
+                    // Initialize schedule with empty objects for each day
+                    days.forEach(day => {
+                        timetable.schedule[day] = {};
                     });
+                    
+                    // Distribute courses across the week
+                    let maxAttempts = days.length * timeSlots.length * 3; // Prevent infinite loops
+                    
+                    // First, ensure each course gets at least one slot
+                    sectionCourses.forEach(course => {
+                        let placed = false;
+                        let attempts = 0;
+                        while (!placed && attempts < maxAttempts) {
+                            const dayIndex = Math.floor(Math.random() * days.length);
+                            const timeIndex = Math.floor(Math.random() * timeSlots.length);
+                            
+                            const day = days[dayIndex];
+                            const timeSlot = timeSlots[timeIndex];
+                            
+                            // If this slot is free, place the course
+                            if (!timetable.schedule[day][timeSlot.start]) {
+                                timetable.schedule[day][timeSlot.start] = {
+                                    courseId: course.id,
+                                    courseCode: course.code,
+                                    courseName: course.name,
+                                    teacher: course.teacher,
+                                    duration: course.duration || 60
+                                };
+                                placed = true;
+                            }
+                            attempts++;
+                        }
+                    });
+                    
+                    // Then fill remaining slots with additional course instances
+                    for (let i = 0; i < timeSlots.length * 2; i++) {
+                        sectionCourses.forEach(course => {
+                            const dayIndex = Math.floor(Math.random() * days.length);
+                            const timeIndex = Math.floor(Math.random() * timeSlots.length);
+                            
+                            const day = days[dayIndex];
+                            const timeSlot = timeSlots[timeIndex];
+                            
+                            // Only fill empty slots
+                            if (!timetable.schedule[day][timeSlot.start]) {
+                                timetable.schedule[day][timeSlot.start] = {
+                                    courseId: course.id,
+                                    courseCode: course.code,
+                                    courseName: course.name,
+                                    teacher: course.teacher,
+                                    duration: course.duration || 60
+                                };
+                            }
+                        });
+                    }
                     
                     // Hide loading indicator
                     loadingIndicator.style.display = 'none';
@@ -370,8 +431,7 @@
                         <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
                             <i class="fas fa-calendar-alt" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem;"></i>
                             <p>No timetable generated yet. Click 'Generate Timetable' to create one.</p>
-                        </div>
-                    `;
+                        </div>`;
                     return;
                 }
                 

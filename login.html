@@ -5,64 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AI TimeTable</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #6366F1;    /* indigo */
+            --secondary-color: #F472B6;  /* pink */
+            --accent-color: #22D3EE;     /* cyan */
+            --background-color: #0F172A;  /* deep navy */
+            --text-color: #F1F5F9;       /* off-white */
+            --light-bg: rgba(255, 255, 255, 0.05);
+            --dark-bg: rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
         .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 420px;
+            margin: auto;
+            padding: 2.5rem;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        
+        .login-container:hover {
+            box-shadow: var(--box-shadow-hover);
+            transform: translateY(-2px);
+        }
+        
+        .login-header {
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
         
         .login-header p {
-            color: #7f8c8d;
-            margin-top: 0;
+            color: var(--medium-gray);
+            margin: 0.5rem 0 0;
+            font-size: 0.95rem;
         }
         
         .form-group {
             margin-bottom: 1.5rem;
+            text-align: left;
         }
         
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #2c3e50;
+            color: var(--text-color);
             font-weight: 500;
+            opacity: 0.9;
+            text-align: left;
         }
         
         .form-control {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+            padding: 0.85rem 1.25rem;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
         }
         
         .form-control:focus {
-            border-color: #3498db;
+            border-color: var(--accent-color);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+            background-color: rgba(0, 0, 0, 0.3);
         }
         
         .btn-login {
             width: 100%;
-            padding: 0.75rem;
-            background-color: #3498db;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), #4f46e5);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
         }
         
         .btn-login:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-login:hover:before {
+            left: 100%;
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
         }
         
         .btn-login:disabled {
@@ -73,14 +150,39 @@
         .login-footer {
             text-align: center;
             margin-top: 1.5rem;
-            color: #7f8c8d;
+            color: rgba(241, 245, 249, 0.7);
             font-size: 0.9rem;
         }
         
-        .login-footer a {
-            color: #3498db;
+        .toggle-form {
+            color: var(--accent-color);
+            cursor: pointer;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-left: 0.25rem;
+            position: relative;
+        }
+        
+        .toggle-form:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        .toggle-form:hover:after {
+            width: 100%;
+        }
+        
+        .toggle-form:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
         }
         
         .login-footer a:hover {
@@ -88,21 +190,25 @@
         }
         
         .error-message {
-            color: #e74c3c;
-            background-color: #fde8e6;
-            padding: 0.75rem;
+            color: #f87171;
+            background-color: rgba(248, 113, 113, 0.1);
+            padding: 0.75rem 1rem;
             border-radius: 6px;
-            margin-bottom: 1.5rem;
-            display: none;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+            border-left: 3px solid #f87171;
         }
         
         .success-message {
-            color: #155724;
-            background-color: #d4edda;
-            padding: 0.75rem;
+            color: #34d399;
+            background-color: rgba(52, 211, 153, 0.1);
+            padding: 0.75rem 1rem;
             border-radius: 6px;
-            margin-bottom: 1.5rem;
-            display: none;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+            border-left: 3px solid #34d399;
         }
         
         .password-strength {
@@ -112,7 +218,7 @@
         
         .strength-meter {
             height: 5px;
-            background: #eee;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
             margin-bottom: 5px;
             overflow: hidden;
@@ -126,7 +232,10 @@
         }
         
         .strength-text {
-            color: #7f8c8d;
+            color: rgba(241, 245, 249, 0.6);
+            font-size: 0.85rem;
+            text-align: left;
+            margin-top: 0.25rem;
         }
     </style>
 </head>
@@ -139,7 +248,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                <li><a href="#" onclick="checkAuthAndRedirect('timetable-generator.html')">Timetable Generator</a></li>
                 <li class="login-link"><a href="login.html" class="active">Login</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="#" class="signout-btn" style="display: none;">
@@ -244,9 +353,7 @@
             try {
                 const response = await fetch('http://localhost:3000/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
                 
@@ -263,7 +370,9 @@
                 } else {
                     let errorMessage = 'Login failed';
                     
-                    if (data.detail) {
+                    if (response.status === 401) {
+                        errorMessage = 'Invalid credentials. Please check your email and password, or register if you don\'t have an account.';
+                    } else if (data.detail) {
                         if (Array.isArray(data.detail)) {
                             errorMessage = data.detail.map(err => err.msg || err).join(', ');
                         } else if (typeof data.detail === 'string') {
@@ -306,9 +415,8 @@
                 return;
             }
             
-            const passwordCheck = checkPasswordStrength(password);
-            if (!passwordCheck.isStrong) {
-                showMessage(passwordCheck.feedback, 'error');
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
                 return;
             }
             
@@ -342,16 +450,24 @@
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
+                    // Auto-login after successful registration
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
                     showMessage('Account created successfully! Redirecting...', 'success');
                     setTimeout(() => {
-                        this.reset();
-                        showLoginForm();
-                        showMessage('Registration successful! Please sign in.', 'success');
-                    }, 1500);
+                        window.location.href = 'index.html';
+                    }, 1000);
                 } else {
                     let errorMessage = 'Registration failed';
                     
-                    if (data.detail) {
+                    if (response.status === 400) {
+                        if (data.detail && data.detail.includes('already registered')) {
+                            errorMessage = 'This email is already registered. Please try logging in instead.';
+                        } else if (data.detail) {
+                            errorMessage = data.detail;
+                        }
+                    } else if (data.detail) {
                         if (Array.isArray(data.detail)) {
                             errorMessage = data.detail.map(err => err.msg || err).join(', ');
                         } else if (typeof data.detail === 'string') {
@@ -361,16 +477,16 @@
                         errorMessage = data.message;
                     }
                     
-                    // Handle specific error cases
-                    if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
-                        errorMessage = 'This email is already registered. Please use a different email or try logging in.';
-                    }
-                    
                     showMessage(errorMessage, 'error');
                 }
                 
             } catch (error) {
                 console.error('Registration error:', error);
+                console.log('Request details:', {
+                    name: fullName,
+                    email: email,
+                    password: password
+                });
                 showMessage('Network error. Please check if the server is running.', 'error');
             } finally {
                 submitBtn.disabled = false;
@@ -492,6 +608,25 @@
         }
     </script>
     
+    <script src="js/error-handler.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+        function checkAuthAndRedirect(page) {
+            if (Auth.isAuthenticated()) {
+                window.location.href = page;
+                return true;
+            } else {
+                alert('Please login to access the Timetable Generator.');
+                return false;
+            }
+        }
+        
+        // Check if already logged in and redirect
+        document.addEventListener('DOMContentLoaded', function() {
+            if (Auth.isAuthenticated()) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
 </body>
 </html>

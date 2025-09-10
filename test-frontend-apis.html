@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Frontend API Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Authentication Test</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testRegister()">Test Register</button>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Health Check</h2>
+        <button onclick="testHealth()">Test Health API</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>University APIs Test</h2>
+        <button onclick="testBranches()">Test Branches</button>
+        <button onclick="testSections()">Test Sections</button>
+        <button onclick="testTeachers()">Test Teachers</button>
+        <button onclick="testRooms()">Test Rooms</button>
+        <button onclick="testSubjects()">Test Subjects</button>
+        <button onclick="testCourses()">Test Courses</button>
+        <div id="universityResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>CRUD Operations Test</h2>
+        <button onclick="testCreateBranch()">Create Branch</button>
+        <button onclick="testCreateSection()">Create Section</button>
+        <button onclick="testCreateTeacher()">Create Teacher</button>
+        <button onclick="testCreateRoom()">Create Room</button>
+        <button onclick="testCreateSubject()">Create Subject</button>
+        <div id="crudResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Complete Integration Test</h2>
+        <button onclick="runCompleteTest()">Run All Tests</button>
+        <button onclick="testAllAPIs()">Quick Test</button>
+        <button onclick="testCRUD()">Test CRUD Only</button>
+        <div id="completeResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let authToken = '';
+
+        // Utility functions
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+            };
+        }
+
+        // Authentication Tests
+        async function testLogin() {
+            const timestamp = Date.now();
+            const email = `testuser${timestamp}@example.com`;
+            const password = 'Test@123456';
+            
+            try {
+                // Register new unique user
+                const regResponse = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const regData = await regResponse.json();
+                
+                if (regResponse.ok && regData.success) {
+                    // Registration successful, now login
+                    const response = await fetch(`${API_BASE}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        authToken = data.access_token;
+                        showResult('authResult', `✅ Login Success: ${data.user.name}`, 'success');
+                    } else {
+                        showResult('authResult', `❌ Login Failed: ${data.detail}`, 'error');
+                    }
+                } else {
+                    showResult('authResult', `❌ Registration Failed: ${regData.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('authResult', `❌ Login Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRegister() {
+            const timestamp = Date.now();
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User Frontend',
+                        email: `frontend${timestamp}@test.com`,
+                        password: 'Frontend@123456'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('authResult', `✅ Register Success: ${data.user.name} (${data.user.email})`, 'success');
+                } else {
+                    showResult('authResult', `❌ Register Failed (${response.status}): ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('authResult', `❌ Register Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Health Check Test
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('healthResult', `✅ Health Check: ${data.message}<br>Database: ${data.database}`, 'success');
+                } else {
+                    showResult('healthResult', `❌ Health Check Failed`, 'error');
+                }
+            } catch (error) {
+                showResult('healthResult', `❌ Health Error: ${error.message}`, 'error');
+            }
+        }
+
+        // University APIs Tests
+        async function testBranches() {
+            try {
+                const response = await fetch(`${API_BASE}/university/branches`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Branches: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Branches Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Branches Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSections() {
+            try {
+                const response = await fetch(`${API_BASE}/university/sections`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Sections: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Sections Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Sections Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTeachers() {
+            try {
+                const response = await fetch(`${API_BASE}/university/teachers`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Teachers: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Teachers Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Teachers Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRooms() {
+            try {
+                const response = await fetch(`${API_BASE}/university/rooms`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Rooms: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Rooms Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Rooms Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSubjects() {
+            try {
+                const response = await fetch(`${API_BASE}/university/subjects`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Subjects: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Subjects Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Subjects Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCourses() {
+            try {
+                const response = await fetch(`${API_BASE}/university/courses`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('universityResult', `✅ Courses: ${data.data.length} found<pre>${JSON.stringify(data.data, null, 2)}</pre>`, 'success');
+                } else {
+                    showResult('universityResult', `❌ Courses Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('universityResult', `❌ Courses Error: ${error.message}`, 'error');
+            }
+        }
+
+        // CRUD Tests
+        async function testCreateBranch() {
+            try {
+                const response = await fetch(`${API_BASE}/university/branches`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        name: 'Electronics Engineering',
+                        code: 'ECE'
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('crudResult', `✅ Branch Created: ${data.data.name} (${data.data.code})`, 'success');
+                } else {
+                    showResult('crudResult', `❌ Branch Creation Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('crudResult', `❌ Branch Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateSection() {
+            try {
+                const response = await fetch(`${API_BASE}/university/sections`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        name: 'B',
+                        year: 2,
+                        semester: 1,
+                        branch_id: 12,
+                        strength: 55
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('crudResult', `✅ Section Created: ${data.data.name} - Year ${data.data.year}`, 'success');
+                } else {
+                    showResult('crudResult', `❌ Section Creation Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('crudResult', `❌ Section Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateTeacher() {
+            try {
+                const response = await fetch(`${API_BASE}/university/teachers`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        name: 'Prof. Alice Johnson',
+                        employee_id: 'EMP003',
+                        department: 'Computer Science',
+                        max_hours_per_day: 7
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('crudResult', `✅ Teacher Created: ${data.data.name} (${data.data.employee_id})`, 'success');
+                } else {
+                    showResult('crudResult', `❌ Teacher Creation Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('crudResult', `❌ Teacher Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateRoom() {
+            try {
+                const response = await fetch(`${API_BASE}/university/rooms`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        number: '103',
+                        building: 'Science Block',
+                        capacity: 50,
+                        room_type: 'lab'
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('crudResult', `✅ Room Created: ${data.data.number} - ${data.data.building}`, 'success');
+                } else {
+                    showResult('crudResult', `❌ Room Creation Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('crudResult', `❌ Room Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateSubject() {
+            try {
+                const response = await fetch(`${API_BASE}/university/subjects`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        name: 'Operating Systems',
+                        code: 'CS303',
+                        credits: 4,
+                        subject_type: 'theory',
+                        hours_per_week: 4
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('crudResult', `✅ Subject Created: ${data.data.name} (${data.data.code})`, 'success');
+                } else {
+                    showResult('crudResult', `❌ Subject Creation Failed: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult('crudResult', `❌ Subject Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Complete Integration Test
+        async function runCompleteTest() {
+            showResult('completeResult', '🔄 Running complete integration test...', 'info');
+            
+            const results = [];
+            
+            // Test Health
+            try {
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                const healthData = await healthResponse.json();
+                results.push(`✅ Health: ${healthData.status}`);
+            } catch (error) {
+                results.push(`❌ Health: ${error.message}`);
+            }
+
+            // Test Login
+            try {
+                const loginResponse = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@test.com',
+                        password: 'Admin@123'
+                    })
+                });
+                const loginData = await loginResponse.json();
+                
+                if (loginResponse.ok && loginData.success) {
+                    authToken = loginData.access_token;
+                    results.push(`✅ Login: ${loginData.user.name}`);
+                } else {
+                    results.push(`❌ Login: ${loginData.detail}`);
+                }
+            } catch (error) {
+                results.push(`❌ Login: ${error.message}`);
+            }
+
+            // Test all university APIs
+            const endpoints = ['branches', 'sections', 'teachers', 'rooms', 'subjects', 'courses'];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE}/university/${endpoint}`, {
+                        headers: getHeaders()
+                    });
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        results.push(`✅ ${endpoint}: ${data.data.length} items`);
+                    } else {
+                        results.push(`❌ ${endpoint}: ${data.detail}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ ${endpoint}: ${error.message}`);
+                }
+            }
+
+            const summary = results.join('<br>');
+            const successCount = results.filter(r => r.startsWith('✅')).length;
+            const totalCount = results.length;
+            
+            showResult('completeResult', 
+                `<h3>Integration Test Results (${successCount}/${totalCount} passed)</h3>${summary}`, 
+                successCount === totalCount ? 'success' : 'error'
+            );
+        }
+
+        // Auto-run health check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            testHealth();
+        });
+
+        // Quick test functions using API tester
+        async function testAllAPIs() {
+            if (window.apiTester) {
+                const results = await window.apiTester.runAllTests();
+                window.apiTester.displayResults(results);
+            } else {
+                showResult('completeResult', '❌ API Tester not loaded', 'error');
+            }
+        }
+
+        async function testCRUD() {
+            if (window.apiTester) {
+                const results = await window.apiTester.runQuickTest();
+                window.apiTester.displayResults(results);
+            } else {
+                showResult('completeResult', '❌ API Tester not loaded', 'error');
+            }
+        }
+    </script>
+    <script src="js/api-test.js"></script>
+</body>
+</html>

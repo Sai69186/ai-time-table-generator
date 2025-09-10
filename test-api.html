@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testHealth()">Test Health</button>
+    <button onclick="testRegister()">Test Register</button>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testBranches()">Test Branches</button>
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('results').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testRegister() {
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'Test123!',
+                        name: 'Test User'
+                    })
+                });
+                const data = await response.json();
+                if (data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                }
+                document.getElementById('results').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'Test123!'
+                    })
+                });
+                const data = await response.json();
+                if (data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                }
+                document.getElementById('results').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testBranches() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/university/branches`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('results').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

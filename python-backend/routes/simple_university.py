@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List
 from services.auth_service import verify_token, get_user_profile
-from config.database import database
+from config.sqlite_database import database
 import logging
 
 logger = logging.getLogger(__name__)
@@ -214,3 +214,53 @@ async def create_subject(
     except Exception as e:
         logger.error(f"Error creating subject: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create subject")
+
+@router.get("/branches")
+async def get_branches(user_id: int = Depends(get_current_user_id)):
+    try:
+        query = "SELECT * FROM branches WHERE user_id = %s"
+        branches = database.execute_query(query, (user_id,))
+        return {"success": True, "data": branches or []}
+    except Exception as e:
+        logger.error(f"Error fetching branches: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch branches")
+
+@router.get("/sections")
+async def get_university_sections(user_id: int = Depends(get_current_user_id)):
+    try:
+        query = "SELECT * FROM university_sections WHERE user_id = %s"
+        sections = database.execute_query(query, (user_id,))
+        return {"success": True, "data": sections or []}
+    except Exception as e:
+        logger.error(f"Error fetching sections: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch sections")
+
+@router.get("/teachers")
+async def get_teachers(user_id: int = Depends(get_current_user_id)):
+    try:
+        query = "SELECT * FROM teachers WHERE user_id = %s"
+        teachers = database.execute_query(query, (user_id,))
+        return {"success": True, "data": teachers or []}
+    except Exception as e:
+        logger.error(f"Error fetching teachers: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch teachers")
+
+@router.get("/rooms")
+async def get_rooms(user_id: int = Depends(get_current_user_id)):
+    try:
+        query = "SELECT * FROM rooms WHERE user_id = %s"
+        rooms = database.execute_query(query, (user_id,))
+        return {"success": True, "data": rooms or []}
+    except Exception as e:
+        logger.error(f"Error fetching rooms: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch rooms")
+
+@router.get("/subjects")
+async def get_subjects(user_id: int = Depends(get_current_user_id)):
+    try:
+        query = "SELECT * FROM subjects WHERE user_id = %s"
+        subjects = database.execute_query(query, (user_id,))
+        return {"success": True, "data": subjects or []}
+    except Exception as e:
+        logger.error(f"Error fetching subjects: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch subjects")

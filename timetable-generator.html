@@ -455,7 +455,9 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="#" class="active">Generate TimeTable</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="#" class="signout-btn">Sign Out</a></li>
+                <li><a href="#" class="signout-btn" onclick="handleSignout(event)">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a></li>
             </ul>
         </nav>
     </header>
@@ -481,7 +483,10 @@
                 </div>
             </div>
             
-            <h1>College Time Table Generator</h1>
+            <div class="user-welcome" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; border-left: 4px solid #3498db;">
+                <h1>College Time Table Generator</h1>
+                <p>Welcome, <span class="current-user-name">User</span>! Create your timetable step by step.</p>
+            </div>
             
             <!-- Step 1: University Setup -->
             <div id="step1" class="form-step active">
@@ -735,79 +740,18 @@
                 
                 <div class="form-actions">
                     <button type="button" class="btn prev-btn" data-prev="3"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn btn-danger" id="resetTimetableBtn">
+                        <i class="fas fa-undo"></i> Reset All
+                    </button>
                     <button type="button" class="btn" id="generateUniversityTimetableBtn">
                         <i class="fas fa-magic"></i> Generate University Timetable
                     </button>
                 </div>
             </div>
         
-        <div class="timing-section">
-            <h2>College Timings</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="collegeStartTime">College Start Time:</label>
-                    <input type="text" id="collegeStartTime" class="form-control" value="09:00 AM" required
-                           placeholder="HH:MM AM/PM" pattern="(1[0-2]|0?[1-9]):[0-5][0-9]\s*[AP]M">
-                    <small class="form-text text-muted">Format: HH:MM AM/PM (e.g., 09:00 AM)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="collegeEndTime">College End Time:</label>
-                    <input type="text" id="collegeEndTime" class="form-control" value="04:00 PM" required
-                           placeholder="HH:MM AM/PM" pattern="(1[0-2]|0?[1-9]):[0-5][0-9]\s*[AP]M">
-                    <small class="form-text text-muted">Format: HH:MM AM/PM (e.g., 04:00 PM)</small>
-                </div>
-            </div>
+  
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="periodDuration">Period Duration (minutes):</label>
-                    <select id="periodDuration" class="form-control">
-                        <option value="45">45 minutes</option>
-                        <option value="50" selected>50 minutes</option>
-                        <option value="55">55 minutes</option>
-                        <option value="60">60 minutes</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="breakDuration">Short Break Duration (minutes):</label>
-                    <select id="breakDuration" class="form-control">
-                        <option value="5">5 minutes</option>
-                        <option value="10" selected>10 minutes</option>
-                        <option value="15">15 minutes</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="lunchStartTime">Lunch Start Time:</label>
-                    <input type="time" id="lunchStartTime" class="form-control" value="12:30">
-                </div>
-                
-                <div class="form-group">
-                    <label for="lunchDuration">Lunch Duration (minutes):</label>
-                    <select id="lunchDuration" class="form-control">
-                        <option value="30">30 minutes</option>
-                        <option value="45" selected>45 minutes</option>
-                        <option value="60">60 minutes</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Working Days:</label>
-                <div class="days-checkbox">
-                    <label><input type="checkbox" name="workingDays" value="Monday" checked> Monday</label>
-                    <label><input type="checkbox" name="workingDays" value="Tuesday" checked> Tuesday</label>
-                    <label><input type="checkbox" name="workingDays" value="Wednesday" checked> Wednesday</label>
-                    <label><input type="checkbox" name="workingDays" value="Thursday" checked> Thursday</label>
-                    <label><input type="checkbox" name="workingDays" value="Friday" checked> Friday</label>
-                    <label><input type="checkbox" name="workingDays" value="Saturday"> Saturday</label>
-                </div>
-            </div>
-        </div>
+
             
             <!-- Section Management Section -->
             <div class="section-management" id="sectionManagement" style="display: none;">
@@ -894,27 +838,7 @@
                 </div>
             </div>
 
-            <!-- Section Management Section -->
-            <div class="section-management">
-                <h3>Sections</h3>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <input type="text" id="sectionName" class="form-control" placeholder="Section name (e.g., CSE-A, ECE-B)">
-                    </div>
-                    <button id="addSectionBtn" class="btn" style="background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Add Section</button>
-                </div>
-                <div id="sectionsList" class="sections-list">
-                    <!-- Sections will be listed here -->
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button id="generateBtn" class="btn">Generate All TimeTables</button>
-                <button id="openSectionManagement" class="btn" style="background-color: #9b59b6;">Manage Sections</button>
-                <button id="openCourseModal" class="btn" style="background-color: #2ecc71;">Add Course</button>
-                <button id="saveTimetableBtn" class="btn" style="background-color: #27ae60; display: none;">Save All TimeTables</button>
-                <button id="resetBtn" class="btn" style="background-color: #e74c3c;">Reset</button>
-            </div>
+  
             
             <div id="timetableContainer" class="timetable-container" style="margin-top: 2rem;">
                 <!-- Timetable will be generated here -->
@@ -926,32 +850,12 @@
         <p>All rights reserved by Vignan Lara</p>
     </footer>
 
+    <script src="js/error-handler.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/timetable-api.js"></script>
     <script src="js/university-timetable.js"></script>
     <script src="js/enhanced-timetable.js"></script>
     <script>
-        // Check if page is being refreshed using sessionStorage
-        (function() {
-            // This flag helps us determine if we're coming from a page refresh
-            const isPageRefresh = sessionStorage.getItem('isRefreshed');
-            
-            if (isPageRefresh) {
-                // Clear the flag for future visits
-                sessionStorage.removeItem('isRefreshed');
-                // Redirect to home page
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Set the flag when the page loads
-            sessionStorage.setItem('isRefreshed', 'true');
-            
-            // Clear the flag when the page is unloaded normally
-            window.addEventListener('beforeunload', function() {
-                sessionStorage.removeItem('isRefreshed');
-            });
-        })();
-    
         // Initialize the API service with authentication
         if (!window.apiService) {
             window.apiService = {
@@ -1012,6 +916,27 @@
     <script src="timetable-script-new.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!Auth.isAuthenticated()) {
+                alert('Please login to access the Timetable Generator');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Display user name
+            const user = Auth.getCurrentUser();
+            if (user && user.name) {
+                const userNameElement = document.querySelector('.current-user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = user.name;
+                }
+            }
+            
+            // Initialize timetable generator
+            initializeTimetableGenerator();
+        });
+        
+        function initializeTimetableGenerator() {
             // Initialize form steps
             const steps = document.querySelectorAll('.form-step');
             const progressSteps = document.querySelectorAll('.step');
@@ -1080,29 +1005,117 @@
                 return isValid;
             }
             
-            // Initialize the Timetable App
+            // Initialize the University Timetable App
             const app = {
+                branches: [],
                 sections: [],
+                teachers: [],
+                rooms: [],
+                subjects: [],
                 courses: [],
                 
-                // Add section
-                addSection: async function() {
-                    const sectionName = document.getElementById('sectionName').value.trim();
-                    if (!sectionName) return;
+                // Initialize app
+                init: async function() {
+                    await this.loadData();
+                    this.setupEventListeners();
+                },
+                
+                // Load existing data
+                loadData: async function() {
+                    try {
+                        // Load branches and populate dropdown
+                        const branchesResponse = await window.apiService.get('/university/branches');
+                        if (branchesResponse?.success) {
+                            this.branches = branchesResponse.data;
+                            this.updateBranchesDropdown();
+                        }
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                    }
+                },
+                
+                // Setup event listeners
+                setupEventListeners: function() {
+                    // Branch creation
+                    document.getElementById('createBranchBtn')?.addEventListener('click', () => this.createBranch());
+                    
+                    // Section creation
+                    document.getElementById('createSectionBtn')?.addEventListener('click', () => this.createSection());
+                    
+                    // Teacher creation
+                    document.getElementById('createTeacherBtn')?.addEventListener('click', () => this.createTeacher());
+                    
+                    // Room creation
+                    document.getElementById('createRoomBtn')?.addEventListener('click', () => this.createRoom());
+                    
+                    // Subject creation
+                    document.getElementById('createSubjectBtn')?.addEventListener('click', () => this.createSubject());
+                    
+                    // Course creation
+                    document.getElementById('createCourseBtn')?.addEventListener('click', () => this.createCourse());
+                    
+                    // Timetable generation
+                    document.getElementById('generateUniversityTimetableBtn')?.addEventListener('click', () => this.generateTimetable());
+                },
+                
+                // Create branch
+                createBranch: async function() {
+                    const name = document.getElementById('branchName').value.trim();
+                    const code = document.getElementById('branchCode').value.trim();
+                    
+                    if (!name || !code) {
+                        alert('Please fill in all branch details');
+                        return;
+                    }
                     
                     try {
-                        const response = await window.apiService.post('/sections', {
-                            name: sectionName,
-                            year: 1
-                        });
+                        const response = await window.timetableAPI.createBranch(name, code);
                         
                         if (response && response.success) {
+                            this.branches.push(response.data);
+                            this.updateBranchesDisplay();
+                            this.updateBranchesDropdown();
+                            document.getElementById('branchName').value = '';
+                            document.getElementById('branchCode').value = '';
+                            alert('Branch created successfully!');
+                        } else {
+                            alert('Failed to create branch: ' + (response?.detail || 'Please check your connection'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating branch:', error);
+                        alert('Error creating branch. Please check your connection and try again.');
+                    }
+                },
+                
+                // Create section
+                createSection: async function() {
+                    const name = document.getElementById('sectionName').value.trim();
+                    const year = parseInt(document.getElementById('sectionYear').value);
+                    const semester = parseInt(document.getElementById('sectionSemester').value);
+                    const branchId = parseInt(document.getElementById('sectionBranch').value);
+                    const strength = parseInt(document.getElementById('sectionStrength').value);
+                    
+                    if (!name || !branchId) {
+                        alert('Please fill in all section details');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await window.timetableAPI.createUniversitySection({
+                            name: name,
+                            year: year,
+                            semester: semester,
+                            branch_id: branchId,
+                            strength: strength
+                        });
+                        
+                        if (response?.success) {
                             this.sections.push(response.data);
-                            this.updateSectionsList();
+                            this.updateSectionsDisplay();
                             this.updateSectionsDropdown();
                             document.getElementById('sectionName').value = '';
                         } else {
-                            alert('Failed to create section: ' + (response?.message || 'Unknown error'));
+                            alert('Failed to create section: ' + (response?.detail || 'Unknown error'));
                         }
                     } catch (error) {
                         console.error('Error creating section:', error);
@@ -1110,80 +1123,139 @@
                     }
                 },
                 
-                // Update sections list
-                updateSectionsList: function() {
-                    const sectionsList = document.getElementById('sectionsList');
-                    if (!sectionsList) return;
+                // Create teacher
+                createTeacher: async function() {
+                    const name = document.getElementById('teacherName').value.trim();
+                    const employeeId = document.getElementById('teacherEmployeeId').value.trim();
+                    const department = document.getElementById('teacherDepartment').value.trim();
+                    const maxHours = parseInt(document.getElementById('teacherMaxHours').value);
                     
-                    sectionsList.innerHTML = this.sections.map(section => `
-                        <div class="section-item">
-                            <span>${section.name}</span>
-                            <div class="actions">
-                                <button class="btn danger" onclick="app.removeSection('${section.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                    
-                    // Enable/disable next button based on sections count
-                    const nextBtn = document.querySelector('#step2 .next-btn');
-                    if (nextBtn) {
-                        nextBtn.disabled = this.sections.length === 0;
-                    }
-                },
-                
-                // Remove section
-                removeSection: function(sectionId) {
-                    this.sections = this.sections.filter(s => s.id !== sectionId);
-                    this.updateSectionsList();
-                    this.updateSectionsDropdown();
-                },
-                
-                // Update sections dropdown
-                updateSectionsDropdown: function() {
-                    const select = document.getElementById('selectedSection');
-                    if (!select) return;
-                    
-                    select.innerHTML = this.sections.map(section => 
-                        `<option value="${section.id}">${section.name}</option>`
-                    ).join('');
-                },
-                
-                // Add course
-                addCourse: async function() {
-                    const sectionId = document.getElementById('selectedSection').value;
-                    const courseName = document.getElementById('courseName').value.trim();
-                    const courseCode = document.getElementById('courseCode').value.trim();
-                    const teacherName = document.getElementById('teacherName').value.trim();
-                    const duration = document.getElementById('courseDuration').value;
-                    
-                    if (!courseName || !courseCode || !teacherName || !sectionId) {
-                        alert('Please fill in all course details and select a section');
+                    if (!name || !employeeId || !department) {
+                        alert('Please fill in all teacher details');
                         return;
                     }
                     
                     try {
-                        const response = await window.apiService.post('/courses', {
-                            name: courseName,
-                            code: courseCode,
-                            teacher: teacherName,
-                            room: '',
-                            duration: parseInt(duration) || 1,
-                            section_id: sectionId,
-                            color: '#3f51b5'
+                        const response = await window.timetableAPI.createTeacher({
+                            name: name,
+                            employee_id: employeeId,
+                            department: department,
+                            max_hours_per_day: maxHours
                         });
                         
-                        if (response && response.success) {
-                            this.courses.push(response.data);
-                            this.updateCoursesList();
-                            
-                            // Reset form
-                            document.getElementById('courseName').value = '';
-                            document.getElementById('courseCode').value = '';
+                        if (response?.success) {
+                            this.teachers.push(response.data);
+                            this.updateTeachersDisplay();
+                            this.updateTeachersDropdown();
                             document.getElementById('teacherName').value = '';
+                            document.getElementById('teacherEmployeeId').value = '';
+                            document.getElementById('teacherDepartment').value = '';
                         } else {
-                            alert('Failed to create course: ' + (response?.message || 'Unknown error'));
+                            alert('Failed to create teacher: ' + (response?.detail || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating teacher:', error);
+                        alert('Error creating teacher. Please try again.');
+                    }
+                },
+                
+                // Create room
+                createRoom: async function() {
+                    const number = document.getElementById('roomNumber').value.trim();
+                    const building = document.getElementById('roomBuilding').value.trim();
+                    const capacity = parseInt(document.getElementById('roomCapacity').value);
+                    const roomType = document.getElementById('roomType').value;
+                    
+                    if (!number || !building) {
+                        alert('Please fill in all room details');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await window.apiService.post('/university/rooms', {
+                            number: number,
+                            building: building,
+                            capacity: capacity,
+                            room_type: roomType
+                        });
+                        
+                        if (response?.success) {
+                            this.rooms.push(response.data);
+                            this.updateRoomsDisplay();
+                            this.updateRoomsDropdown();
+                            document.getElementById('roomNumber').value = '';
+                            document.getElementById('roomBuilding').value = '';
+                        } else {
+                            alert('Failed to create room: ' + (response?.detail || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating room:', error);
+                        alert('Error creating room. Please try again.');
+                    }
+                },
+                
+                // Create subject
+                createSubject: async function() {
+                    const name = document.getElementById('subjectName').value.trim();
+                    const code = document.getElementById('subjectCode').value.trim();
+                    const credits = parseInt(document.getElementById('subjectCredits').value);
+                    const subjectType = document.getElementById('subjectType').value;
+                    const hours = parseInt(document.getElementById('subjectHours').value);
+                    
+                    if (!name || !code) {
+                        alert('Please fill in all subject details');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await window.apiService.post('/university/subjects', {
+                            name: name,
+                            code: code,
+                            credits: credits,
+                            subject_type: subjectType,
+                            hours_per_week: hours
+                        });
+                        
+                        if (response?.success) {
+                            this.subjects.push(response.data);
+                            this.updateSubjectsDisplay();
+                            this.updateSubjectsDropdown();
+                            document.getElementById('subjectName').value = '';
+                            document.getElementById('subjectCode').value = '';
+                        } else {
+                            alert('Failed to create subject: ' + (response?.detail || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating subject:', error);
+                        alert('Error creating subject. Please try again.');
+                    }
+                },
+                
+                // Create course
+                createCourse: async function() {
+                    const sectionId = parseInt(document.getElementById('courseSectionId').value);
+                    const subjectId = parseInt(document.getElementById('courseSubjectId').value);
+                    const teacherId = parseInt(document.getElementById('courseTeacherId').value);
+                    const roomId = parseInt(document.getElementById('courseRoomId').value) || null;
+                    
+                    if (!sectionId || !subjectId || !teacherId) {
+                        alert('Please fill in all required course details');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await window.apiService.post('/university/courses', {
+                            section_id: sectionId,
+                            subject_id: subjectId,
+                            teacher_id: teacherId,
+                            room_id: roomId
+                        });
+                        
+                        if (response?.success) {
+                            this.courses.push(response.data);
+                            this.updateCoursesDisplay();
+                        } else {
+                            alert('Failed to create course: ' + (response?.detail || 'Unknown error'));
                         }
                     } catch (error) {
                         console.error('Error creating course:', error);
@@ -1191,70 +1263,254 @@
                     }
                 },
                 
-                // Update courses list
-                updateCoursesList: function() {
-                    const coursesList = document.getElementById('coursesList');
-                    if (!coursesList) return;
+                // Update display functions
+                updateBranchesDisplay: function() {
+                    const display = document.getElementById('branchesDisplay');
+                    if (!display) return;
                     
-                    coursesList.innerHTML = this.courses.map(course => {
-                        const section = this.sections.find(s => s.id === course.sectionId);
-                        return `
-                            <div class="course-item">
-                                <div>
-                                    <strong>${course.code}</strong> - ${course.name}<br>
-                                    <small>Teacher: ${course.teacher} | Duration: ${course.duration} hr(s) | Section: ${section ? section.name : 'N/A'}</small>
-                                </div>
-                                <div class="actions">
-                                    <button class="btn danger" onclick="app.removeCourse('${course.id}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
+                    display.innerHTML = this.branches.map(branch => `
+                        <div class="entity-item">
+                            <strong>${branch.name}</strong> (${branch.code})
+                        </div>
+                    `).join('');
                 },
                 
-                // Remove course
-                removeCourse: function(courseId) {
-                    this.courses = this.courses.filter(c => c.id !== courseId);
-                    this.updateCoursesList();
+                updateBranchesDropdown: function() {
+                    const selects = document.querySelectorAll('.branch-select');
+                    selects.forEach(select => {
+                        select.innerHTML = '<option value="">Select Branch</option>' + 
+                            this.branches.map(branch => 
+                                `<option value="${branch.id}">${branch.name}</option>`
+                            ).join('');
+                    });
+                },
+                
+                updateSectionsDisplay: function() {
+                    const display = document.getElementById('sectionsDisplay');
+                    if (!display) return;
+                    
+                    display.innerHTML = this.sections.map(section => `
+                        <div class="entity-item">
+                            <strong>${section.name}</strong> - Year ${section.year}, Semester ${section.semester}
+                        </div>
+                    `).join('');
+                },
+                
+                updateSectionsDropdown: function() {
+                    const selects = document.querySelectorAll('.section-select');
+                    selects.forEach(select => {
+                        select.innerHTML = '<option value="">Select Section</option>' + 
+                            this.sections.map(section => 
+                                `<option value="${section.id}">${section.name}</option>`
+                            ).join('');
+                    });
+                },
+                
+                updateTeachersDisplay: function() {
+                    const display = document.getElementById('teachersDisplay');
+                    if (!display) return;
+                    
+                    display.innerHTML = this.teachers.map(teacher => `
+                        <div class="entity-item">
+                            <strong>${teacher.name}</strong> (${teacher.employee_id}) - ${teacher.department}
+                        </div>
+                    `).join('');
+                },
+                
+                updateTeachersDropdown: function() {
+                    const select = document.getElementById('courseTeacherId');
+                    if (!select) return;
+                    
+                    select.innerHTML = '<option value="">Select Teacher</option>' + 
+                        this.teachers.map(teacher => 
+                            `<option value="${teacher.id}">${teacher.name}</option>`
+                        ).join('');
+                },
+                
+                updateRoomsDisplay: function() {
+                    const display = document.getElementById('roomsDisplay');
+                    if (!display) return;
+                    
+                    display.innerHTML = this.rooms.map(room => `
+                        <div class="entity-item">
+                            <strong>Room ${room.number}</strong> - ${room.building} (Capacity: ${room.capacity})
+                        </div>
+                    `).join('');
+                },
+                
+                updateRoomsDropdown: function() {
+                    const select = document.getElementById('courseRoomId');
+                    if (!select) return;
+                    
+                    select.innerHTML = '<option value="">Select Room</option>' + 
+                        this.rooms.map(room => 
+                            `<option value="${room.id}">Room ${room.number} - ${room.building}</option>`
+                        ).join('');
+                },
+                
+                updateSubjectsDisplay: function() {
+                    const display = document.getElementById('subjectsDisplay');
+                    if (!display) return;
+                    
+                    display.innerHTML = this.subjects.map(subject => `
+                        <div class="entity-item">
+                            <strong>${subject.name}</strong> (${subject.code}) - ${subject.credits} credits
+                        </div>
+                    `).join('');
+                },
+                
+                updateSubjectsDropdown: function() {
+                    const select = document.getElementById('courseSubjectId');
+                    if (!select) return;
+                    
+                    select.innerHTML = '<option value="">Select Subject</option>' + 
+                        this.subjects.map(subject => 
+                            `<option value="${subject.id}">${subject.name} (${subject.code})</option>`
+                        ).join('');
+                },
+                
+                updateCoursesDisplay: function() {
+                    const display = document.getElementById('coursesDisplay');
+                    if (!display) return;
+                    
+                    display.innerHTML = this.courses.map(course => `
+                        <div class="entity-item">
+                            Course assigned successfully
+                        </div>
+                    `).join('');
                 },
                 
                 // Generate timetable
-                generateTimetable: function() {
-                    // This is a simplified version - you would implement the actual timetable generation logic here
+                generateTimetable: async function() {
+                    const sectionId = parseInt(document.getElementById('timetableSectionId').value);
+                    const startTime = document.getElementById('startTime').value;
+                    const endTime = document.getElementById('endTime').value;
+                    const periodDuration = parseInt(document.getElementById('periodDuration').value);
+                    const lunchStart = document.getElementById('lunchStart').value;
+                    
+                    const workingDays = Array.from(document.querySelectorAll('input[name="workingDays"]:checked'))
+                        .map(cb => cb.value);
+                    
+                    if (!sectionId) {
+                        alert('Please select a section for timetable generation');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await window.timetableAPI.generateUniversityTimetable({
+                            section_id: sectionId,
+                            start_time: startTime,
+                            end_time: endTime,
+                            period_duration: periodDuration,
+                            lunch_start: lunchStart,
+                            working_days: workingDays
+                        });
+                        
+                        if (response?.success) {
+                            this.displayTimetable(response.data);
+                        } else {
+                            alert('Failed to generate timetable: ' + (response?.detail || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error generating timetable:', error);
+                        alert('Error generating timetable. Please try again.');
+                    }
+                },
+                
+                // Display timetable
+                displayTimetable: function(timetableData) {
                     const container = document.getElementById('timetableContainer');
                     if (!container) return;
                     
-                    container.innerHTML = `
-                        <div class="timetable-preview">
-                            <h3>Timetable Preview</h3>
-                            <p>Your timetable will be generated here based on the sections and courses you've added.</p>
-                            <p>Total Sections: ${this.sections.length}</p>
-                            <p>Total Courses: ${this.courses.length}</p>
+                    const courses = timetableData.courses || [];
+                    const config = timetableData.config || {};
+                    
+                    let html = `
+                        <div class="timetable-header-info">
+                            <h3>Generated Timetable</h3>
+                            <p>Section ID: ${timetableData.section_id}</p>
+                            <p>Total Courses: ${courses.length}</p>
+                            <p>Working Days: ${config.working_days?.join(', ') || 'Mon-Fri'}</p>
                         </div>
+                        <div class="university-timetable-grid">
+                            <div class="time-header">Time</div>
                     `;
                     
-                    // Show save button
-                    document.getElementById('saveTimetableBtn').style.display = 'inline-block';
+                    // Add day headers
+                    const days = config.working_days || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                    days.forEach(day => {
+                        html += `<div class="day-header">${day}</div>`;
+                    });
+                    
+                    // Generate time slots
+                    const timeSlots = this.generateTimeSlots(config.start_time || '09:00', config.end_time || '16:00');
+                    
+                    timeSlots.forEach(timeSlot => {
+                        html += `<div class="time-slot">${timeSlot}</div>`;
+                        
+                        days.forEach(day => {
+                            const course = courses[Math.floor(Math.random() * courses.length)];
+                            if (course && Math.random() > 0.3) {
+                                html += `
+                                    <div class="course-slot">
+                                        <div class="course-code">${course.name}</div>
+                                        <div class="course-teacher">${course.teacher}</div>
+                                        <div class="course-room">${course.room || 'TBA'}</div>
+                                    </div>
+                                `;
+                            } else {
+                                html += `<div class="empty-slot">Free</div>`;
+                            }
+                        });
+                    });
+                    
+                    html += '</div>';
+                    container.innerHTML = html;
                 },
                 
-                // Save timetable
-                saveTimetable: function() {
-                    // Implement save functionality (e.g., download as PDF, save to server, etc.)
-                    alert('Timetable saved successfully!');
+                // Generate time slots
+                generateTimeSlots: function(startTime, endTime) {
+                    const slots = [];
+                    let current = this.parseTime(startTime);
+                    const end = this.parseTime(endTime);
+                    
+                    while (current < end) {
+                        const next = current + 50; // 50 minutes
+                        slots.push(`${this.formatTime(current)}-${this.formatTime(next)}`);
+                        current = next + 10; // 10 minute break
+                    }
+                    
+                    return slots;
+                },
+                
+                parseTime: function(timeStr) {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    return hours * 60 + minutes;
+                },
+                
+                formatTime: function(minutes) {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+                }
+                
+            };
+            
+            // Signout handler
+            window.handleSignout = function(event) {
+                event.preventDefault();
+                
+                if (confirm('Are you sure you want to sign out?')) {
+                    Auth.logout();
                 }
             };
             
-            // Initialize event listeners
-            document.getElementById('addSectionBtn')?.addEventListener('click', () => app.addSection());
-            document.getElementById('addCourseBtn')?.addEventListener('click', () => app.addCourse());
-            document.getElementById('generateTimetableBtn')?.addEventListener('click', () => app.generateTimetable());
-            document.getElementById('saveTimetableBtn')?.addEventListener('click', () => app.saveTimetable());
+            // Initialize app when DOM is loaded
+            app.init();
             
             // Make app globally available
             window.app = app;
-        });
+        }
     </script>
 </body>
 </html>

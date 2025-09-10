@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Fix Test</title>
+</head>
+<body>
+    <h1>Authentication Fix Test</h1>
+    <button onclick="testAuth()">Test Auth</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAuth() {
+            const result = document.getElementById('result');
+            
+            // Test 1: Register new user
+            const timestamp = Date.now();
+            try {
+                const regResponse = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: `test${timestamp}@example.com`,
+                        password: 'Test@123456'
+                    })
+                });
+                
+                const regData = await regResponse.json();
+                
+                if (regResponse.ok && regData.success) {
+                    result.innerHTML += `✅ Registration: SUCCESS<br>`;
+                    
+                    // Test 2: Login with new user
+                    const loginResponse = await fetch('http://localhost:3000/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: `test${timestamp}@example.com`,
+                            password: 'Test@123456'
+                        })
+                    });
+                    
+                    const loginData = await loginResponse.json();
+                    
+                    if (loginResponse.ok && loginData.success) {
+                        result.innerHTML += `✅ Login: SUCCESS<br>`;
+                        result.innerHTML += `Token: ${loginData.access_token.substring(0, 20)}...<br>`;
+                    } else {
+                        result.innerHTML += `❌ Login: ${loginData.detail}<br>`;
+                    }
+                } else {
+                    result.innerHTML += `❌ Registration: ${regData.detail}<br>`;
+                }
+            } catch (error) {
+                result.innerHTML += `❌ Error: ${error.message}<br>`;
+            }
+        }
+    </script>
+</body>
+</html>

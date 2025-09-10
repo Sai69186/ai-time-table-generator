@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Health Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>API Health Test</h1>
+    <button onclick="testAllAPIs()">Test All APIs</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        
+        async function testAPI(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (data) options.body = JSON.stringify(data);
+                
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json();
+                return { success: response.ok, data: result, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        function addResult(test, result) {
+            const div = document.createElement('div');
+            div.className = `test-result ${result.success ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <strong>${test}</strong><br>
+                Status: ${result.status || 'Error'}<br>
+                ${result.success ? 'SUCCESS' : 'FAILED'}<br>
+                ${result.error ? `Error: ${result.error}` : ''}
+                ${result.data ? `<pre>${JSON.stringify(result.data, null, 2)}</pre>` : ''}
+            `;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        async function testAllAPIs() {
+            clearResults();
+            
+            const tests = [
+                { name: 'Health Check', endpoint: '/api/health' },
+                { name: 'Get Sections', endpoint: '/api/university/sections/public' },
+                { name: 'Get Teachers', endpoint: '/api/university/teachers/public' },
+                { name: 'Get Subjects', endpoint: '/api/university/subjects/public' },
+                { name: 'Create Section', endpoint: '/api/university/sections/public', method: 'POST', data: { name: 'Test Section', year: 1, semester: 1, branch_id: 1 } },
+                { name: 'Create Teacher', endpoint: '/api/university/teachers/public', method: 'POST', data: { name: 'Test Teacher', employee_id: 'T001', department: 'CSE' } },
+                { name: 'Create Subject', endpoint: '/api/university/subjects/public', method: 'POST', data: { name: 'Test Subject', code: 'TS101' } },
+                { name: 'Generate Timetable', endpoint: '/api/university/timetables/generate/public', method: 'POST', data: { section_id: 1 } }
+            ];
+            
+            for (const test of tests) {
+                const result = await testAPI(test.endpoint, test.method, test.data);
+                addResult(test.name, result);
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

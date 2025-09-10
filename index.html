@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Random Time Table Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
     <header>
@@ -15,10 +16,10 @@
             </div>
             <ul class="nav-links">
                 <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="timetable-generator.html">Timetable Generator</a></li>
+                <li><a href="#" onclick="checkAuthAndRedirect('timetable-generator.html')">Timetable Generator</a></li>
                 <li class="login-link"><a href="login.html">Login</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="#" class="signout-btn" style="display: none;">
+                <li><a href="#" class="signout-btn" style="display: none;" onclick="handleSignout(event)">
                     <i class="fas fa-sign-out-alt"></i> Sign Out
                 </a></li>
             </ul>
@@ -40,7 +41,7 @@
                 <h1>Welcome back, <span class="user-name">User</span>!</h1>
                 <p>Ready to create your next timetable?</p>
                 <div class="action-buttons">
-                    <a href="timetable-generator.html" class="btn btn-primary">Generate Timetable</a>
+                    <a href="#" onclick="checkAuthAndRedirect('timetable-generator.html')" class="btn btn-primary">Generate Timetable</a>
                     <a href="about.html" class="btn btn-secondary">View Features</a>
                 </div>
             </div>
@@ -55,28 +56,55 @@
         <p>All rights reserved by @Vignan Lara</p>
     </footer>
 
+    <script src="js/error-handler.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/timetable-api.js"></script>
+    <script src="js/api-test.js"></script>
     <script src="script.js"></script>
     
     <script>
+        // Signout handler
+        function handleSignout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to sign out?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.reload();
+            }
+        }
+        
+        // Check authentication and redirect function
+        function checkAuthAndRedirect(page) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login to access the Timetable Generator.');
+                window.location.href = 'login.html';
+                return false;
+            }
+            window.location.href = page;
+            return true;
+        }
+        
         // Update UI based on authentication status
         document.addEventListener('DOMContentLoaded', function() {
-            const isAuthenticated = Auth.isAuthenticated();
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
             const welcomeSection = document.getElementById('welcomeSection');
             const userSection = document.getElementById('userSection');
-            const authButtons = document.getElementById('authButtons');
+            const loginLink = document.querySelector('.login-link');
+            const signoutBtn = document.querySelector('.signout-btn');
             
-            if (isAuthenticated) {
+            if (token && user.name) {
                 welcomeSection.style.display = 'none';
                 userSection.style.display = 'block';
-                
-                const user = Auth.getCurrentUser();
-                if (user) {
-                    document.querySelector('.user-name').textContent = user.name;
-                }
+                loginLink.style.display = 'none';
+                signoutBtn.style.display = 'block';
+                document.querySelector('.user-name').textContent = user.name;
             } else {
                 welcomeSection.style.display = 'block';
                 userSection.style.display = 'none';
+                loginLink.style.display = 'block';
+                signoutBtn.style.display = 'none';
             }
         });
     </script>

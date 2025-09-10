@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Health Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .pending { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .endpoint { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>AI Timetable Generator - API Health Test</h1>
+    
+    <div class="test-section">
+        <h2>Server Health Check</h2>
+        <button onclick="testServerHealth()">Test Server Health</button>
+        <div id="serverHealth"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Authentication APIs</h2>
+        <button onclick="testAuthHealth()">Test Auth Health</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testRegister()">Test Register</button>
+        <div id="authResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>University APIs</h2>
+        <button onclick="testUniversityHealth()">Test University Health</button>
+        <button onclick="testAllUniversityAPIs()">Test All University APIs</button>
+        <div id="universityResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Timetable Generation</h2>
+        <button onclick="testTimetableGeneration()">Test Timetable Generation</button>
+        <div id="timetableResults"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:3000';
+        let authToken = null;
+
+        function displayResult(elementId, title, success, data, error = null) {
+            const element = document.getElementById(elementId);
+            const className = success ? 'success' : 'error';
+            const status = success ? '✅ SUCCESS' : '❌ ERROR';
+            
+            const result = `
+                <div class="${className}">
+                    <h4>${status}: ${title}</h4>
+                    ${error ? `<p><strong>Error:</strong> ${error}</p>` : ''}
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+            
+            element.innerHTML += result;
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function testServerHealth() {
+            document.getElementById('serverHealth').innerHTML = '<div class="pending">Testing server health...</div>';
+            
+            const result = await makeRequest(`${baseUrl}/api/health`);
+            displayResult('serverHealth', 'Server Health Check', result.success, result.data, result.error);
+        }
+
+        async function testAuthHealth() {
+            document.getElementById('authResults').innerHTML = '<div class="pending">Testing auth health...</div>';
+            
+            const result = await makeRequest(`${baseUrl}/api/auth/health`);
+            displayResult('authResults', 'Auth Health Check', result.success, result.data, result.error);
+        }
+
+        async function testLogin() {
+            const result = await makeRequest(`${baseUrl}/api/auth/login`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: 'test@example.com',
+                    password: 'password123'
+                })
+            });
+            
+            if (result.success && result.data.access_token) {
+                authToken = result.data.access_token;
+            }
+            
+            displayResult('authResults', 'Login Test', result.success, result.data, result.error);
+        }
+
+        async function testRegister() {
+            const result = await makeRequest(`${baseUrl}/api/auth/register`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: 'Test User',
+                    email: 'newuser@example.com',
+                    password: 'password123'
+                })
+            });
+            
+            displayResult('authResults', 'Register Test', result.success, result.data, result.error);
+        }
+
+        async function testUniversityHealth() {
+            document.getElementById('universityResults').innerHTML = '<div class="pending">Testing university health...</div>';
+            
+            const result = await makeRequest(`${baseUrl}/api/university/health`);
+            displayResult('universityResults', 'University Health Check', result.success, result.data, result.error);
+        }
+
+        async function testAllUniversityAPIs() {
+            document.getElementById('universityResults').innerHTML = '<div class="pending">Testing all university APIs...</div>';
+            
+            // Test Branches
+            let result = await makeRequest(`${baseUrl}/api/university/branches`, {
+                method: 'POST',
+                body: JSON.stringify({ name: 'Computer Science', code: 'CSE' })
+            });
+            displayResult('universityResults', 'Create Branch', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/branches`);
+            displayResult('universityResults', 'Get Branches', result.success, result.data, result.error);
+            
+            // Test Teachers
+            result = await makeRequest(`${baseUrl}/api/university/teachers`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    name: 'Dr. John Smith', 
+                    employee_id: 'EMP001',
+                    department: 'Computer Science',
+                    max_hours_per_day: 6
+                })
+            });
+            displayResult('universityResults', 'Create Teacher', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/teachers`);
+            displayResult('universityResults', 'Get Teachers', result.success, result.data, result.error);
+            
+            // Test Rooms
+            result = await makeRequest(`${baseUrl}/api/university/rooms`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    number: '101', 
+                    building: 'Main Building',
+                    capacity: 60,
+                    room_type: 'classroom'
+                })
+            });
+            displayResult('universityResults', 'Create Room', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/rooms`);
+            displayResult('universityResults', 'Get Rooms', result.success, result.data, result.error);
+            
+            // Test Subjects
+            result = await makeRequest(`${baseUrl}/api/university/subjects`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    name: 'Data Structures', 
+                    code: 'CS201',
+                    credits: 4,
+                    subject_type: 'theory',
+                    hours_per_week: 4
+                })
+            });
+            displayResult('universityResults', 'Create Subject', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/subjects`);
+            displayResult('universityResults', 'Get Subjects', result.success, result.data, result.error);
+            
+            // Test Sections
+            result = await makeRequest(`${baseUrl}/api/university/sections`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    name: 'CSE-A', 
+                    year: 2,
+                    semester: 3,
+                    branch_id: 1,
+                    strength: 60
+                })
+            });
+            displayResult('universityResults', 'Create Section', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/sections`);
+            displayResult('universityResults', 'Get Sections', result.success, result.data, result.error);
+            
+            // Test Courses
+            result = await makeRequest(`${baseUrl}/api/university/courses`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    section_id: 1,
+                    subject_id: 1,
+                    teacher_id: 1,
+                    room_id: 1
+                })
+            });
+            displayResult('universityResults', 'Create Course', result.success, result.data, result.error);
+            
+            result = await makeRequest(`${baseUrl}/api/university/courses`);
+            displayResult('universityResults', 'Get Courses', result.success, result.data, result.error);
+        }
+
+        async function testTimetableGeneration() {
+            document.getElementById('timetableResults').innerHTML = '<div class="pending">Testing timetable generation...</div>';
+            
+            // First ensure we have test data
+            await testAllUniversityAPIs();
+            
+            // Test timetable generation
+            let result = await makeRequest(`${baseUrl}/api/university/timetables/generate`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    section_id: 1,
+                    start_time: '09:00',
+                    end_time: '17:00',
+                    break_duration: 60,
+                    lunch_start: '12:00',
+                    lunch_end: '13:00'
+                })
+            });
+            displayResult('timetableResults', 'Generate Timetable', result.success, result.data, result.error);
+            
+            // Test get timetable
+            result = await makeRequest(`${baseUrl}/api/university/sections/1/timetable`);
+            displayResult('timetableResults', 'Get Timetable', result.success, result.data, result.error);
+            
+            // Test get all timetables
+            result = await makeRequest(`${baseUrl}/api/university/timetables`);
+            displayResult('timetableResults', 'Get All Timetables', result.success, result.data, result.error);
+        }
+
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            setTimeout(() => {
+                testServerHealth();
+                testAuthHealth();
+                testUniversityHealth();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

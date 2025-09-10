@@ -122,7 +122,14 @@ class TimetableManager {
         }
 
         try {
-            const response = await window.timetableAPI.createSection(sectionName, 1);
+            const sectionData = {
+                name: sectionName,
+                year: 1,
+                semester: 1,
+                branch_id: 1,
+                strength: 60
+            };
+            const response = await window.timetableAPI.createUniversitySection(sectionData);
             if (response && response.success) {
                 this.sections.push(response.data);
                 this.updateSectionsList();
@@ -130,7 +137,7 @@ class TimetableManager {
                 document.getElementById('sectionName').value = '';
                 this.showMessage('Section added successfully', 'success');
             } else {
-                this.showMessage(response?.message || 'Failed to add section', 'error');
+                this.showMessage(response?.detail || 'Failed to add section', 'error');
             }
         } catch (error) {
             console.error('Error adding section:', error);
@@ -231,7 +238,7 @@ class TimetableManager {
                 
                 this.showMessage('Course added successfully', 'success');
             } else {
-                this.showMessage(response?.message || 'Failed to add course', 'error');
+                this.showMessage(response?.detail || 'Failed to add course', 'error');
             }
         } catch (error) {
             console.error('Error adding course:', error);

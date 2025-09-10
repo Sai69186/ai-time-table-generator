@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        input { width: 200px; padding: 5px; margin: 5px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Simple Auth Test</h1>
+    
+    <div class="form">
+        <h3>Register</h3>
+        <input type="text" id="regName" placeholder="Name" value="Test User">
+        <input type="email" id="regEmail" placeholder="Email" value="test@test.com">
+        <input type="password" id="regPassword" placeholder="Password" value="123456">
+        <button onclick="register()">Register</button>
+    </div>
+    
+    <div class="form">
+        <h3>Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@test.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="123456">
+        <button onclick="login()">Login</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        function showResult(message, type) {
+            document.getElementById('result').innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`Registration Success: ${data.user.name}`, 'success');
+                } else {
+                    showResult(`Registration Error: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult(`Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`Login Success: ${data.user.name}`, 'success');
+                } else {
+                    showResult(`Login Error: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showResult(`Network Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

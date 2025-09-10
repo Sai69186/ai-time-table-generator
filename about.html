@@ -7,23 +7,31 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --text-color: #333;
-            --light-bg: #f8f9fa;
-            --white: #ffffff;
-            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --primary-color: #6366F1;    /* indigo */
+            --secondary-color: #F472B6;  /* pink */
+            --accent-color: #22D3EE;     /* cyan */
+            --background-color: #0F172A;  /* deep navy */
+            --text-color: #F1F5F9;       /* off-white */
+            --light-bg: rgba(255, 255, 255, 0.05);
+            --white: #F1F5F9;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             --transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
         
         .about-container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 3rem 2rem;
-            background: var(--white);
-            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 16px;
             box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .about-section, .contact-section {
@@ -70,6 +78,7 @@
             line-height: 1.8;
             margin-bottom: 1.5rem;
             font-size: 1.05rem;
+            opacity: 0.9;
         }
         
         .about-section ul {
@@ -100,12 +109,12 @@
         }
         
         .contact-card {
-            background: var(--white);
+            background: rgba(255, 255, 255, 0.05);
             padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: var(--transition);
-            border: 1px solid #eee;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .contact-card:hover {
@@ -134,7 +143,8 @@
         
         .contact-card p {
             margin: 0.8rem 0;
-            color: #555;
+            color: var(--text-color);
+            opacity: 0.9;
             display: flex;
             align-items: center;
         }
@@ -164,11 +174,12 @@
         }
         
         .visit-us {
-            background: var(--light-bg);
+            background: rgba(255, 255, 255, 0.05);
             padding: 2rem;
             border-radius: 10px;
             margin-top: 2rem;
-            border-left: 4px solid var(--secondary-color);
+            border-left: 4px solid var(--accent-color);
+            backdrop-filter: blur(5px);
         }
         
         @media (max-width: 768px) {
@@ -187,10 +198,11 @@
         }
         
         .about-section h2, .contact-section h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            color: var(--white);
+            border-bottom: 2px solid var(--accent-color);
             padding-bottom: 0.5rem;
             margin-bottom: 1.5rem;
+            display: inline-block;
         }
         
         .contact-info {

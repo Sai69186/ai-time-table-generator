@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - Teacher, Room, Subject APIs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .pending { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px; }
+        .endpoint { font-weight: bold; color: #007bff; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>API Test - Teacher, Room, Subject APIs</h1>
+    
+    <div class="test-section">
+        <h2>🏥 Server Health</h2>
+        <button onclick="testHealth()">Test Server Health</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔐 Authentication</h2>
+        <button onclick="quickLogin()">Quick Login (Test User)</button>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>👨‍🏫 Teacher API</h2>
+        <button onclick="testTeacherAPI()">Test Teacher API</button>
+        <button onclick="createTestTeacher()">Create Test Teacher</button>
+        <div id="teacherResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏢 Room API</h2>
+        <button onclick="testRoomAPI()">Test Room API</button>
+        <button onclick="createTestRoom()">Create Test Room</button>
+        <div id="roomResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📚 Subject API</h2>
+        <button onclick="testSubjectAPI()">Test Subject API</button>
+        <button onclick="createTestSubject()">Create Test Subject</button>
+        <div id="subjectResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 All APIs Test</h2>
+        <button onclick="testAllAPIs()">Test All APIs</button>
+        <div id="allResult"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:3000/api';
+        let authToken = localStorage.getItem('token');
+
+        function displayResult(elementId, title, success, data, error = null) {
+            const element = document.getElementById(elementId);
+            const className = success ? 'success' : 'error';
+            const status = success ? '✅ SUCCESS' : '❌ ERROR';
+            
+            const result = `
+                <div class="${className}">
+                    <h4>${status}: ${title}</h4>
+                    ${error ? `<p><strong>Error:</strong> ${error}</p>` : ''}
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+            
+            element.innerHTML += result;
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function testHealth() {
+            document.getElementById('healthResult').innerHTML = '<div class="pending">Testing server health...</div>';
+            const result = await makeRequest(`${baseUrl}/health`);
+            displayResult('healthResult', 'Server Health Check', result.success, result.data, result.error);
+        }
+
+        async function quickLogin() {
+            document.getElementById('authResult').innerHTML = '<div class="pending">Logging in...</div>';
+            
+            // First register a test user
+            const timestamp = Date.now();
+            const email = `test${timestamp}@example.com`;
+            const password = 'Test@123';
+            
+            const regResult = await makeRequest(`${baseUrl}/register`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: 'Test User',
+                    email: email,
+                    password: password
+                })
+            });
+            
+            if (regResult.success && regResult.data.access_token) {
+                authToken = regResult.data.access_token;
+                localStorage.setItem('token', authToken);
+                displayResult('authResult', 'Quick Login', true, { message: 'Logged in successfully', user: regResult.data.user });
+            } else {
+                displayResult('authResult', 'Quick Login', false, regResult.data, regResult.error);
+            }
+        }
+
+        async function testTeacherAPI() {
+            document.getElementById('teacherResult').innerHTML = '<div class="pending">Testing Teacher API...</div>';
+            
+            // Test GET teachers
+            const getResult = await makeRequest(`${baseUrl}/university/teachers`);
+            displayResult('teacherResult', 'GET Teachers', getResult.success, getResult.data, getResult.error);
+        }
+
+        async function createTestTeacher() {
+            const timestamp = Date.now();
+            const result = await makeRequest(`${baseUrl}/university/teachers`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: `Dr. Test Teacher ${timestamp}`,
+                    employee_id: `EMP${timestamp}`,
+                    department: 'Computer Science',
+                    max_hours_per_day: 6
+                })
+            });
+            displayResult('teacherResult', 'CREATE Teacher', result.success, result.data, result.error);
+        }
+
+        async function testRoomAPI() {
+            document.getElementById('roomResult').innerHTML = '<div class="pending">Testing Room API...</div>';
+            
+            // Test GET rooms
+            const getResult = await makeRequest(`${baseUrl}/university/rooms`);
+            displayResult('roomResult', 'GET Rooms', getResult.success, getResult.data, getResult.error);
+        }
+
+        async function createTestRoom() {
+            const timestamp = Date.now();
+            const result = await makeRequest(`${baseUrl}/university/rooms`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    number: `R${timestamp}`,
+                    building: 'Test Building',
+                    capacity: 50,
+                    room_type: 'classroom'
+                })
+            });
+            displayResult('roomResult', 'CREATE Room', result.success, result.data, result.error);
+        }
+
+        async function testSubjectAPI() {
+            document.getElementById('subjectResult').innerHTML = '<div class="pending">Testing Subject API...</div>';
+            
+            // Test GET subjects
+            const getResult = await makeRequest(`${baseUrl}/university/subjects`);
+            displayResult('subjectResult', 'GET Subjects', getResult.success, getResult.data, getResult.error);
+        }
+
+        async function createTestSubject() {
+            const timestamp = Date.now();
+            const result = await makeRequest(`${baseUrl}/university/subjects`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: `Test Subject ${timestamp}`,
+                    code: `TS${timestamp}`,
+                    credits: 3,
+                    subject_type: 'theory',
+                    hours_per_week: 3
+                })
+            });
+            displayResult('subjectResult', 'CREATE Subject', result.success, result.data, result.error);
+        }
+
+        async function testAllAPIs() {
+            document.getElementById('allResult').innerHTML = '<div class="pending">Testing all APIs...</div>';
+            
+            // Test all APIs in sequence
+            await testHealth();
+            await quickLogin();
+            
+            // Wait a bit for login to complete
+            setTimeout(async () => {
+                await testTeacherAPI();
+                await createTestTeacher();
+                await testRoomAPI();
+                await createTestRoom();
+                await testSubjectAPI();
+                await createTestSubject();
+                
+                displayResult('allResult', 'All APIs Test', true, { message: 'All API tests completed. Check individual sections for results.' });
+            }, 1000);
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            setTimeout(testHealth, 500);
+        };
+    </script>
+</body>
+</html>

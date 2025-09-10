@@ -91,15 +91,18 @@ const TimetableApp = (function() {
         elements.addSectionBtn = document.getElementById('addSectionBtn');
         elements.sectionNameInput = document.getElementById('sectionName');
         elements.sectionsList = document.getElementById('sectionsList');
-        elements.timetableContainer = document.getElementById('timetableContainer');
     }
 
     // Set up event listeners
     function setupEventListeners() {
+        // Reset button click handler
+        const resetBtn = document.getElementById('resetTimetableBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', resetTimetable);
+        }
         elements.generateBtn.addEventListener('click', generateTimetable);
         elements.openCourseModalBtn.addEventListener('click', () => showModal('courseModal'));
         elements.openSectionManagementBtn.addEventListener('click', () => showModal('sectionManagement'));
-        elements.resetBtn.addEventListener('click', resetForm);
         elements.saveTimetableBtn.addEventListener('click', saveTimetable);
         elements.closeModalBtn.addEventListener('click', () => hideModal('courseModal'));
         elements.cancelCourseBtn.addEventListener('click', () => hideModal('courseModal'));
@@ -497,10 +500,28 @@ const TimetableApp = (function() {
         }
     }
 
+    // Reset the entire timetable
+    function resetTimetable() {
+        if (confirm('Are you sure you want to reset the timetable? This will clear all courses and sections.')) {
+            // Clear the timetable display
+            elements.timetableContainer.innerHTML = '';
+            
+            // Reset the state
+            state.courses = [];
+            state.timetables = {};
+            state.conflicts.clear();
+            
+            // Reset the UI
+            updateCoursesList();
+            showSuccess('Timetable has been reset successfully!');
+        }
+    }
+
     // Public API
     return {
         init: init,
         showModal: showModal,
+        resetTimetable: resetTimetable,
         hideModal: hideModal,
         showError: showError,
         showSuccess: showSuccess

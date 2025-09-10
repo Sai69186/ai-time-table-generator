@@ -14,6 +14,19 @@ class Database:
     
     def connect(self):
         try:
+            # First try to create database if it doesn't exist
+            temp_connection = mysql.connector.connect(
+                host=os.getenv('DB_HOST', 'localhost'),
+                user=os.getenv('DB_USER', 'root'),
+                password=os.getenv('DB_PASSWORD', '')
+            )
+            temp_cursor = temp_connection.cursor()
+            temp_cursor.execute("CREATE DATABASE IF NOT EXISTS timetable")
+            temp_connection.commit()
+            temp_cursor.close()
+            temp_connection.close()
+            
+            # Now connect to the database
             self.connection = mysql.connector.connect(
                 host=os.getenv('DB_HOST', 'localhost'),
                 database=os.getenv('DB_NAME', 'timetable'),
@@ -24,6 +37,7 @@ class Database:
             print("MySQL Connected Successfully")
         except Error as e:
             print(f"MySQL connection failed: {e}")
+            print("Please ensure MySQL is running and credentials are correct")
             self.connection = None
             self.cursor = None
     
